@@ -1,0 +1,41 @@
+.upload-card { padding: 2rem; }
+
+.result-header { margin-bottom: 1.5rem; }
+.result-summary {
+  display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: center;
+  padding: 2rem;
+}
+.result-summary__rings { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+@media (max-width: 720px) {
+  .result-summary { grid-template-columns: 1fr; text-align: center; }
+  .result-summary__rings { grid-template-columns: repeat(2, 1fr); }
+}
+
+.section-checks .checks-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; margin-top: .75rem; }
+.check { display: flex; align-items: center; gap: .4rem; color: var(--danger); font-weight: 500; font-size: .9rem; }
+.check span { font-weight: 700; }
+.check--ok  { color: var(--success); }
+@media (max-width: 600px) { .checks-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.issue-list { list-style: none; padding: 0; margin: 0; }
+.issue { display: flex; gap: .75rem; align-items: flex-start; padding: .65rem 0; border-bottom: 1px solid var(--border-soft); }
+.issue:last-child { border-bottom: 0; }
+
+.suggestion { padding: .65rem 0; border-bottom: 1px solid var(--border-soft); }
+.suggestion:last-child { border-bottom: 0; }
+.suggestion p { margin: .25rem 0 0; font-size: .92rem; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; }
+.chip {
+  display: inline-flex; padding: .25rem .6rem; border-radius: 999px;
+  font-size: .82rem; font-weight: 500; border: 1px solid var(--border-soft);
+}
+.chip--ok   { background: rgba(16,185,129,.1); color: var(--success); border-color: rgba(16,185,129,.25); }
+.chip--miss { background: rgba(239,68,68,.08);  color: var(--danger);  border-color: rgba(239,68,68,.25); }
+
+.loading-strip { margin-top: 1.5rem; }
+
+/* spacing between consecutive result cards */
+.card + .card,
+.card + .grid,
+.grid + .card { margin-top: 1rem; }

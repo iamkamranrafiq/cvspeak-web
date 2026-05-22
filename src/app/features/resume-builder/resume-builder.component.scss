@@ -1,0 +1,31 @@
+.builder { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+@media (max-width: 1000px) { .builder { grid-template-columns: 1fr; } }
+
+.builder__preview { position: sticky; top: 80px; align-self: start; }
+
+.resume-page {
+  background: white;
+  color: #111;
+  padding: 2rem 2.25rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: .92rem;
+  line-height: 1.55;
+  min-height: 700px;
+}
+.resume-header h1 { margin: 0; font-size: 1.8rem; color: #111; }
+.resume-header__title { color: #666; margin: .15rem 0; }
+.resume-header__contact { color: #666; font-size: .85rem; margin: .25rem 0 1rem; }
+.resume-page h2 { font-size: .95rem; text-transform: uppercase; letter-spacing: .08em; border-bottom: 1.5px solid #111; padding-bottom: .25rem; margin: 1.25rem 0 .65rem; }
+.resume-item { margin-bottom: .85rem; }
+.resume-item__top { display: flex; justify-content: space-between; gap: 1rem; }
+.resume-page ul { margin: .35rem 0 0; padding-left: 1.1rem; }
+.resume-page li { margin: .15rem 0; }
+
+@media print {
+  body * { visibility: hidden; }
+  #preview, #preview * { visibility: visible; }
+  #preview { position: absolute; left: 0; top: 0; width: 100%; }
+  .resume-page { box-shadow: none; border-radius: 0; }
+}

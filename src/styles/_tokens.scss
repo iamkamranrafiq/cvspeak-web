@@ -1,0 +1,66 @@
+/* =====================================================================
+ * Design tokens — light/dark, no auth required.
+ * ===================================================================== */
+
+:root {
+  --brand-50:  #f3eeff;
+  --brand-100: #e4d8ff;
+  --brand-500: #7c3aed;
+  --brand-600: #6d28d9;
+  --brand-700: #5b21b6;
+
+  --accent-cyan-500: #06b6d4;
+  --accent-emerald-500: #10b981;
+
+  --surface-0: #ffffff;
+  --surface-1: #f8f9fc;
+  --surface-2: #eef0f6;
+  --surface-translucent: rgba(255,255,255,.72);
+
+  --text:       #0b1226;
+  --text-muted: #5b6478;
+
+  --border-soft:   #e5e7ee;
+  --border-strong: #d2d6e0;
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger:  #ef4444;
+  --info:    #3b82f6;
+
+  --shadow-sm: 0 1px 2px rgba(11, 18, 38, .04);
+  --shadow-md: 0 4px 24px rgba(11, 18, 38, .08);
+  --shadow-lg: 0 20px 60px rgba(11, 18, 38, .12);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  --gradient-hero: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+  --gradient-soft: linear-gradient(180deg, #f3eeff 0%, #ffffff 100%);
+}
+
+[data-theme='dark'] {
+  --brand-50:  #1a1430;
+  --brand-100: #2a2050;
+
+  --surface-0: #0b1020;
+  --surface-1: #11172a;
+  --surface-2: #1a2138;
+  --surface-translucent: rgba(11,16,32,.78);
+
+  --text:       #eef2ff;
+  --text-muted: #9aa3b8;
+
+  --border-soft:   #1f2740;
+  --border-strong: #2a3252;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-md: 0 6px 30px rgba(0,0,0,.45);
+  --shadow-lg: 0 20px 70px rgba(0,0,0,.6);
+
+  --gradient-soft: linear-gradient(180deg, #11172a 0%, #0b1020 100%);
+}

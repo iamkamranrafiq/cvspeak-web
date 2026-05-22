@@ -1,0 +1,128 @@
+<section class="section">
+  <div class="container container--narrow">
+
+    <!-- INTRO ------------------------------------------------------ -->
+    <header *ngIf="!hasResult()" class="text-center" style="margin-bottom: 2rem;">
+      <div class="badge">Free</div>
+      <h1>AI Resume Analyzer</h1>
+      <p class="text-muted">Upload your resume — PDF, DOCX, or TXT. We'll score it across six dimensions and tell you exactly what to fix.</p>
+    </header>
+
+    <!-- UPLOAD FORM ----------------------------------------------- -->
+    <div *ngIf="!hasResult()" class="card upload-card">
+      <app-file-upload (fileSelected)="onFile($event)"></app-file-upload>
+
+      <div style="margin-top: 1.5rem;">
+        <label class="label" for="role">Target role (optional, sharpens keyword scoring)</label>
+        <select id="role" class="select" [ngModel]="targetRole()" (ngModelChange)="targetRole.set($event)">
+          <option *ngFor="let r of roles" [value]="r.slug">{{ r.label }}</option>
+        </select>
+      </div>
+
+      <div *ngIf="error()" class="alert alert--danger" style="margin-top: 1rem;">{{ error() }}</div>
+
+      <button class="btn btn--primary btn--block btn--lg" style="margin-top: 1.25rem;"
+              [disabled]="!file() || loading()" (click)="analyze()">
+        <span *ngIf="!loading()">Analyze my resume</span>
+        <span *ngIf="loading()">Analyzing…</span>
+      </button>
+
+      <p class="text-muted" style="font-size: .82rem; text-align:center; margin-top: 1rem;">
+        Your file is auto-deleted after 30 days. No account needed.
+      </p>
+    </div>
+
+    <!-- LOADING --------------------------------------------------- -->
+    <div *ngIf="loading() && !hasResult()" class="loading-strip">
+      <div class="skeleton" style="height: 80px;"></div>
+      <div class="skeleton" style="height: 200px; margin-top: 1rem;"></div>
+    </div>
+
+    <!-- RESULTS --------------------------------------------------- -->
+    <ng-container *ngIf="hasResult()">
+      <div class="result-header text-center">
+        <h1>Your ATS Score</h1>
+        <p class="text-muted">Based on six weighted signals. Higher is better.</p>
+      </div>
+
+      <div class="card result-summary">
+        <div class="result-summary__main">
+          <app-score-ring [value]="result()!.score.overallScore" label="Overall" [size]="180"></app-score-ring>
+        </div>
+        <div class="result-summary__rings">
+          <app-score-ring [value]="result()!.score.formatScore"       label="Format"       [size]="86"></app-score-ring>
+          <app-score-ring [value]="result()!.score.keywordScore"      label="Keywords"     [size]="86"></app-score-ring>
+          <app-score-ring [value]="result()!.score.readabilityScore"  label="Readability"  [size]="86"></app-score-ring>
+          <app-score-ring [value]="result()!.score.grammarScore"      label="Grammar"      [size]="86"></app-score-ring>
+          <app-score-ring [value]="result()!.score.structureScore"    label="Structure"    [size]="86"></app-score-ring>
+        </div>
+      </div>
+
+      <!-- Section presence -->
+      <div class="card section-checks">
+        <h3>Section checks</h3>
+        <div class="checks-grid">
+          <div class="check" [class.check--ok]="result()!.score.contactInfoPresent">
+            <span>{{ result()!.score.contactInfoPresent ? '✓' : '✗' }}</span> Contact info
+          </div>
+          <div class="check" [class.check--ok]="result()!.score.hasSummary">
+            <span>{{ result()!.score.hasSummary ? '✓' : '✗' }}</span> Summary
+          </div>
+          <div class="check" [class.check--ok]="result()!.score.hasExperience">
+            <span>{{ result()!.score.hasExperience ? '✓' : '✗' }}</span> Experience
+          </div>
+          <div class="check" [class.check--ok]="result()!.score.hasEducation">
+            <span>{{ result()!.score.hasEducation ? '✓' : '✗' }}</span> Education
+          </div>
+          <div class="check" [class.check--ok]="result()!.score.hasSkills">
+            <span>{{ result()!.score.hasSkills ? '✓' : '✗' }}</span> Skills
+          </div>
+        </div>
+      </div>
+
+      <!-- Issues -->
+      <div *ngIf="result()!.score.issues.length" class="card">
+        <h3>Issues to fix</h3>
+        <ul class="issue-list">
+          <li *ngFor="let i of result()!.score.issues" [class]="'issue issue--' + i.severity">
+            <span class="badge" [class.badge--danger]="i.severity === 'high'" [class.badge--warning]="i.severity === 'medium'">{{ i.severity }}</span>
+            {{ i.message }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Suggestions -->
+      <div *ngIf="result()!.score.suggestions.length" class="card">
+        <h3>Suggestions</h3>
+        <div class="suggestion" *ngFor="let s of result()!.score.suggestions">
+          <strong>{{ s.title }}</strong>
+          <p class="text-muted">{{ s.detail }}</p>
+        </div>
+      </div>
+
+      <!-- Keywords -->
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Keywords found ({{ result()!.score.keywordsFound.length }})</h3>
+          <div class="chips">
+            <span *ngFor="let k of result()!.score.keywordsFound" class="chip chip--ok">{{ k }}</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Missing ({{ result()!.score.keywordsMissing.length }})</h3>
+          <div class="chips">
+            <span *ngFor="let k of result()!.score.keywordsMissing" class="chip chip--miss">{{ k }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content:center; margin-top: 2rem;">
+        <button class="btn btn--ghost" (click)="reset()">Analyze another resume</button>
+      </div>
+
+      <!-- Ad slot placed AFTER result, never inside it -->
+      <app-ad-slot slotId="analyzer-after-result" variant="footer"></app-ad-slot>
+    </ng-container>
+
+  </div>
+</section>

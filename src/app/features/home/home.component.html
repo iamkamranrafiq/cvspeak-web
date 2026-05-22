@@ -1,0 +1,107 @@
+<!-- HERO ------------------------------------------------------------ -->
+<section class="hero">
+  <div class="container hero__inner">
+    <div class="badge">Free • No signup • Private</div>
+    <h1>
+      Beat the ATS. <br>
+      Land more <span class="gradient-text">interviews.</span>
+    </h1>
+    <p class="hero__lede">
+      Upload your resume and get an instant AI-powered analysis: ATS score, missing keywords,
+      grammar issues, and a recruiter-readability check. All free. No account needed.
+    </p>
+    <div class="hero__cta">
+      <a routerLink="/resume-analyzer" class="btn btn--primary btn--lg">Analyze my resume</a>
+      <a routerLink="/ats-checker" class="btn btn--ghost btn--lg">Try ATS checker</a>
+    </div>
+    <div class="hero__trust text-muted">
+      <span>★★★★★ 4.9 user rating</span>
+      <span>•</span>
+      <span>50,000+ resumes analyzed</span>
+      <span>•</span>
+      <span>Files auto-deleted</span>
+    </div>
+  </div>
+  <div class="hero__bg" aria-hidden="true"></div>
+</section>
+
+<!-- TOOLS GRID ------------------------------------------------------ -->
+<section class="section">
+  <div class="container">
+    <header class="text-center" style="margin-bottom: 2.5rem;">
+      <div class="badge">Every tool</div>
+      <h2>Everything you need to land your next role</h2>
+      <p class="text-muted">Pick a tool. Get an answer in seconds.</p>
+    </header>
+
+    <div class="grid grid-3 tools-grid">
+      <a *ngFor="let t of tools(); trackBy: trackTool" [routerLink]="t.urlPath" class="card tool-card">
+        <div class="tool-card__icon">⚡</div>
+        <h3>{{ t.name }}</h3>
+        <p class="text-muted">{{ t.description }}</p>
+        <div class="tool-card__cta">Open tool →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS ---------------------------------------------------- -->
+<section class="section section--soft">
+  <div class="container">
+    <header class="text-center" style="margin-bottom: 2.5rem;">
+      <div class="badge">Loved by job seekers</div>
+      <h2>What people say</h2>
+    </header>
+    <div class="grid grid-3">
+      <article class="card testimonial" *ngFor="let t of testimonials">
+        <div class="testimonial__stars">★★★★★</div>
+        <blockquote>"{{ t.text }}"</blockquote>
+        <footer>
+          <strong>{{ t.name }}</strong>
+          <span class="text-muted">{{ t.role }}</span>
+        </footer>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- AD SLOT - between content blocks, not in hero or analysis areas -->
+<div class="container">
+  <app-ad-slot slotId="home-mid-1" variant="inline"></app-ad-slot>
+</div>
+
+<!-- BLOG PREVIEW STRIP -------------------------------------------- -->
+<section class="section">
+  <div class="container">
+    <header class="text-center" style="margin-bottom: 2rem;">
+      <div class="badge">From the blog</div>
+      <h2>Resume tips that actually move the needle</h2>
+    </header>
+    <div class="row" style="justify-content:center;">
+      <a routerLink="/blog" class="btn btn--ghost">Read the blog →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ ------------------------------------------------------------ -->
+<section class="section section--soft">
+  <div class="container container--narrow">
+    <header class="text-center" style="margin-bottom: 2rem;">
+      <div class="badge">FAQ</div>
+      <h2>Common questions</h2>
+    </header>
+    <details *ngFor="let f of faqs" class="faq">
+      <summary>{{ f.q }}</summary>
+      <p>{{ f.a }}</p>
+    </details>
+  </div>
+</section>
+
+<!-- FINAL CTA ------------------------------------------------------ -->
+<section class="section cta">
+  <div class="container text-center">
+    <h2>Ready to find what's holding your resume back?</h2>
+    <p class="text-muted">One upload. Instant feedback. No signup.</p>
+    <a routerLink="/resume-analyzer" class="btn btn--primary btn--lg" style="margin-top: 1rem;">Analyze my resume — Free</a>
+  </div>
+</section>

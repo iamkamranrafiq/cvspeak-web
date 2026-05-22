@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.angular/
+out-tsc/
+.env
+.env.local
+*.log
+.vscode/
+.idea/
+.DS_Store
+coverage/
