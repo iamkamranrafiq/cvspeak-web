@@ -32,6 +32,11 @@ export const routes: Routes = [
     title: 'Free Resume Templates — ATS-Friendly | CVSpeak'
   },
   {
+    path: 'templates/:slug',
+    loadComponent: () => import('./features/templates/template-detail.component').then(m => m.TemplateDetailComponent),
+    title: 'Resume Template | CVSpeak'
+  },
+  {
     path: 'cover-letter',
     loadComponent: () => import('./features/cover-letter/cover-letter.component').then(m => m.CoverLetterComponent),
     title: 'AI Cover Letter Generator — Free | CVSpeak'

@@ -124,6 +124,15 @@ export interface ToolDto {
   useCount: number;
 }
 
+export interface ColorPalette {
+  name?:    string;
+  primary?: string;
+  accent?:  string;
+  surface?: string;
+  ink?:     string;
+}
+export interface Typography { heading?: string; body?: string; }
+
 export interface TemplateSummary {
   id: string;
   slug: string;
@@ -135,6 +144,19 @@ export interface TemplateSummary {
   previewUrl?: string;
   atsFriendly: boolean;
   isPremium: boolean;
+  downloadCount: number;
+  experienceLevel?: string;
+  industries: string[];
+  palette: ColorPalette;
+  typography: Typography;
+  popularity: number;
+  tags: string[];
+  recommendedFor: string[];
+  layoutType?: string;
+  sections: string[];
+  supportedLanguages: string[];
+  featured: boolean;
+  trending: boolean;
 }
 
 export interface CoverLetterResponse {

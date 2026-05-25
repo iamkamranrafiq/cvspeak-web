@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiBase:   'http://localhost:5000',
+  apiBase:   'https://localhost:52600',
   siteUrl:   'http://localhost:4200',
   gaTrackingId: '',
   adsense: {

@@ -12,7 +12,7 @@ import { ThemeService } from '@core/services/theme.service';
     <header class="nav">
       <div class="nav__container">
         <a routerLink="/" class="nav__brand" aria-label="CVSpeak home">
-          <app-logo size="32"></app-logo>
+          <app-logo size="32" [animated]="true"></app-logo>
           <span class="nav__brand-text">CV<em>Speak</em></span>
         </a>
 

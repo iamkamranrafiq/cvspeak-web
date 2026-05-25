@@ -48,11 +48,20 @@ export class ApiService {
   }
 
   // Templates
-  listTemplates(category?: string, role?: string, country?: string, page = 1, pageSize = 24): Observable<PagedList<TemplateSummary>> {
-    const q = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
-    if (category) q.set('category', category);
-    if (role)     q.set('role', role);
-    if (country)  q.set('country', country);
+  listTemplates(filters: {
+    search?: string; category?: string; country?: string; level?: string;
+    atsOnly?: boolean; sort?: string; page?: number; pageSize?: number;
+  } = {}): Observable<PagedList<TemplateSummary>> {
+    const q = new URLSearchParams({
+      page:     String(filters.page     ?? 1),
+      pageSize: String(filters.pageSize ?? 60),
+      sort:     filters.sort ?? 'popular'
+    });
+    if (filters.search)   q.set('search',   filters.search);
+    if (filters.category) q.set('category', filters.category);
+    if (filters.country)  q.set('country',  filters.country);
+    if (filters.level)    q.set('level',    filters.level);
+    if (filters.atsOnly)  q.set('atsOnly',  'true');
     return this.http.get<PagedList<TemplateSummary>>(`/api/v1/templates?${q.toString()}`);
   }
 

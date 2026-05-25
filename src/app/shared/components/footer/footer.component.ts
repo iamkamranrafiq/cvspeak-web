@@ -15,7 +15,7 @@ import { LogoComponent } from '../logo/logo.component';
             <app-logo size="28"></app-logo>
             <span>CV<em>Speak</em></span>
           </a>
-          <p class="footer__tag">Free AI tools to land more interviews. Built for job seekers, no signup.</p>
+          <p class="footer__tag">Make your resume speak. Free AI tools to land more interviews — no signup, no catch.</p>
         </div>
 
         <div class="footer__cols">
