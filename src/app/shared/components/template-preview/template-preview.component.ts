@@ -39,8 +39,8 @@ import { TemplateSummary } from '@core/models/api.models';
         <aside class="tp__side" *ngIf="def.layoutType === 'sidebar-left' || def.layoutType === 'sidebar-right'">
           <div class="tp__avatar">{{ initials() }}</div>
           <h3>Contact</h3>
-          <p class="tp__small">{{ sample().fullName.split(' ')[0].toLowerCase() }}&#64;example.com</p>
-          <p class="tp__small">+1 555 010 2024</p>
+          <p class="tp__small">{{ email() }}</p>
+          <p class="tp__small">{{ phone() }}</p>
           <p class="tp__small">{{ location() }}</p>
           <h3>Skills</h3>
           <ul class="tp__chips">
@@ -53,7 +53,7 @@ import { TemplateSummary } from '@core/models/api.models';
             <h1>{{ sample().fullName }}</h1>
             <p class="tp__title">{{ sample().title }}</p>
             <p class="tp__contact" *ngIf="!isSidebar()">
-              {{ sample().fullName.split(' ')[0].toLowerCase() }}&#64;example.com · +1 555 010 2024 · {{ location() }}
+              {{ email() }} · {{ phone() }} · {{ location() }}
             </p>
             <div class="tp__rule"></div>
           </header>
@@ -276,14 +276,19 @@ import { TemplateSummary } from '@core/models/api.models';
 export class TemplatePreviewComponent {
   @Input({ required: true }) def!: TemplateSummary;
   @Input() thumb = true;
+  /** Optional real user data. When provided, displaces the sample candidate. */
+  @Input() data?: SampleResume | null;
 
   // Computed properties driven by def
   theme = computed(() => COUNTRY_BY_CODE[this.def.countryCode ?? '']?.theme ?? 'silicon-valley');
-  sample = computed<SampleResume>(() => sampleFor(this.def.category));
+  sample = computed<SampleResume>(() => this.data ?? sampleFor(this.def.category));
   isSidebar = computed(() => this.def.layoutType === 'sidebar-left' || this.def.layoutType === 'sidebar-right');
   initials = computed(() =>
     this.sample().fullName.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase());
+  email = computed(() => this.sample().email ?? (this.sample().fullName.split(' ')[0].toLowerCase() + '@example.com'));
+  phone = computed(() => this.sample().phone ?? '+1 555 010 2024');
   location = computed(() => {
+    if (this.sample().location) return this.sample().location!;
     const cc = this.def.countryCode ?? '';
     return ({
       us: 'San Francisco, CA', ca: 'Toronto, ON', uk: 'London, UK',

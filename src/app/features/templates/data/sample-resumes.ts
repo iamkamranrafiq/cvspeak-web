@@ -26,6 +26,12 @@ export interface SampleResume {
   skills: string;
   experience: ExperienceEntry[];
   education: EducationEntry;
+  /** Optional contact overrides. When provided (e.g. by the Resume Builder),
+   *  the preview uses these instead of the generated example contact strings. */
+  email?:    string;
+  phone?:    string;
+  location?: string;
+  linkedin?: string;
 }
 
 // ----- Default / "Silicon-style" software engineer -----
