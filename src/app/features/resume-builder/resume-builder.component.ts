@@ -6,8 +6,8 @@ import { ApiService } from '@core/services/api.service';
 import { SeoService } from '@core/services/seo.service';
 import { TemplateSummary } from '@core/models/api.models';
 import { TemplatePreviewComponent } from '@shared/components/template-preview/template-preview.component';
-import { SampleResume } from '@features/templates/data/sample-resumes';
-import { COUNTRY_BY_CODE } from '@features/templates/data/countries';
+import { SampleResume, sampleFor } from '@features/templates/data/sample-resumes';
+import { COUNTRY_BY_CODE, locationForCountry } from '@features/templates/data/countries';
 import { CATEGORIES } from '@features/templates/data/categories';
 
 interface ExperienceItem { role: string; company: string; from: string; to: string; bullets: string; }
@@ -50,7 +50,7 @@ interface EducationItem  { degree: string; school: string; year: string; }
         <!-- Two-column layout -->
         <div class="builder">
           <!-- ============================ FORM ============================ -->
-          <div class="builder__form card">
+          <div class="builder__form card" (input)="onEdit()">
             <h3>Contact</h3>
             <div class="grid grid-2">
               <input class="input" placeholder="Full name"        [(ngModel)]="name">
@@ -97,6 +97,7 @@ interface EducationItem  { degree: string; school: string; year: string; }
 
             <div class="builder__cta">
               <button class="btn btn--primary" (click)="print()">⬇ Download as PDF</button>
+              <button class="btn btn--ghost" (click)="clearAll()">Start blank</button>
             </div>
           </div>
 
@@ -150,7 +151,7 @@ interface EducationItem  { degree: string; school: string; year: string; }
       border: 1px solid var(--border-soft); margin-bottom: .65rem;
     }
     .btn--sm { padding: .35rem .8rem; font-size: .82rem; margin-top: .5rem; }
-    .builder__cta { margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid var(--border-soft); }
+    .builder__cta { margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid var(--border-soft); display: flex; gap: .6rem; flex-wrap: wrap; }
 
     .builder__preview { position: sticky; top: 84px; }
     .preview-frame {
@@ -259,11 +260,48 @@ export class ResumeBuilderComponent implements OnInit {
         next: r => {
           const hit = r.items.find(t => t.slug === slug) ?? null;
           this.template.set(hit);
+          // Seed the form with the template's sample candidate the first time
+          // so the preview looks complete and is editable in place. We only do
+          // this once, and only while the form is still untouched.
+          if (hit && !this.userEdited) this.prefillFromSample(hit);
           this.loading.set(false);
         },
         error: _ => { this.loading.set(false); }
       });
     });
+  }
+
+  /** Has the user changed anything? Guards against clobbering edits when the
+   *  query param re-emits (e.g. on navigation). */
+  private userEdited = false;
+  onEdit(): void { this.userEdited = true; }
+
+  /** Fill every form field from the template's sample candidate. */
+  private prefillFromSample(t: TemplateSummary): void {
+    const s = sampleFor(t.category);
+    const handle = s.fullName.toLowerCase().replace(/[^a-z]+/g, '');
+    this.name     = s.fullName;
+    this.title    = s.title;
+    this.email    = `${handle}@email.com`;
+    this.phone    = '+1 555 010 2024';
+    this.location = locationForCountry(t.countryCode);
+    this.linkedin = `linkedin.com/in/${handle}`;
+    this.summary  = s.summary;
+    this.skills   = s.skills;
+    this.experience.set(s.experience.map(e => {
+      const [from, to] = (e.dates || '').split(/[—–-]/).map(x => x.trim());
+      return { role: e.role, company: e.company, from: from || '', to: to || '', bullets: e.bullets.join('\n') };
+    }));
+    this.education.set([{ degree: s.education.degree, school: s.education.school, year: s.education.dates }]);
+  }
+
+  /** Wipe the form to a blank slate (keeps the selected template). */
+  clearAll(): void {
+    this.userEdited = true;
+    this.name = this.title = this.email = this.phone = this.location = this.linkedin = '';
+    this.summary = this.skills = '';
+    this.experience.set([{ role: '', company: '', from: '', to: '', bullets: '' }]);
+    this.education.set([{ degree: '', school: '', year: '' }]);
   }
 
   addExperience():  void { this.experience.update(a => [...a, { role: '', company: '', from: '', to: '', bullets: '' }]); }

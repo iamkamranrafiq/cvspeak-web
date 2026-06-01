@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, computed } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { sampleFor, SampleResume } from '@features/templates/data/sample-resumes';
-import { COUNTRY_BY_CODE } from '@features/templates/data/countries';
+import { COUNTRY_BY_CODE, locationForCountry } from '@features/templates/data/countries';
 import { TemplateSummary } from '@core/models/api.models';
 
 /**
@@ -20,23 +20,23 @@ import { TemplateSummary } from '@core/models/api.models';
   template: `
     <div class="tp"
          [class]="'tp--theme-' + theme()"
-         [class.tp--thumb]="thumb"
-         [style.--tp-primary]="def.palette?.primary"
-         [style.--tp-accent]="def.palette?.accent"
-         [style.--tp-surface]="def.palette?.surface"
-         [style.--tp-ink]="def.palette?.ink"
-         [style.--tp-font-h]="def.typography?.heading"
-         [style.--tp-font-b]="def.typography?.body">
+         [class.tp--thumb]="thumb()"
+         [style.--tp-primary]="def().palette?.primary"
+         [style.--tp-accent]="def().palette?.accent"
+         [style.--tp-surface]="def().palette?.surface"
+         [style.--tp-ink]="def().palette?.ink"
+         [style.--tp-font-h]="def().typography?.heading"
+         [style.--tp-font-b]="def().typography?.body">
 
-      <div class="tp__page" [class.tp__page--editorial]="def.layoutType === 'editorial'"
-                            [class.tp__page--sidebar-left]="def.layoutType === 'sidebar-left'"
-                            [class.tp__page--sidebar-right]="def.layoutType === 'sidebar-right'"
-                            [class.tp__page--two-column]="def.layoutType === 'two-column'"
-                            [class.tp__page--compact]="def.layoutType === 'compact'"
-                            [class.tp__page--header-block]="def.layoutType === 'header-block'">
+      <div class="tp__page" [class.tp__page--editorial]="def().layoutType === 'editorial'"
+                            [class.tp__page--sidebar-left]="def().layoutType === 'sidebar-left'"
+                            [class.tp__page--sidebar-right]="def().layoutType === 'sidebar-right'"
+                            [class.tp__page--two-column]="def().layoutType === 'two-column'"
+                            [class.tp__page--compact]="def().layoutType === 'compact'"
+                            [class.tp__page--header-block]="def().layoutType === 'header-block'">
 
         <!-- Sidebar (when layout asks for it) -->
-        <aside class="tp__side" *ngIf="def.layoutType === 'sidebar-left' || def.layoutType === 'sidebar-right'">
+        <aside class="tp__side" *ngIf="def().layoutType === 'sidebar-left' || def().layoutType === 'sidebar-right'">
           <div class="tp__avatar">{{ initials() }}</div>
           <h3>Contact</h3>
           <p class="tp__small">{{ email() }}</p>
@@ -274,37 +274,27 @@ import { TemplateSummary } from '@core/models/api.models';
   `]
 })
 export class TemplatePreviewComponent {
-  @Input({ required: true }) def!: TemplateSummary;
-  @Input() thumb = true;
+  // Signal inputs — required so the computeds below react to input changes
+  // (plain @Input properties are NOT tracked by computed(), which is why
+  // live-typed data wasn't refreshing the preview).
+  def   = input.required<TemplateSummary>();
+  thumb = input(true);
   /** Optional real user data. When provided, displaces the sample candidate. */
-  @Input() data?: SampleResume | null;
+  data  = input<SampleResume | null>(null);
 
-  // Computed properties driven by def
-  theme = computed(() => COUNTRY_BY_CODE[this.def.countryCode ?? '']?.theme ?? 'silicon-valley');
-  sample = computed<SampleResume>(() => this.data ?? sampleFor(this.def.category));
-  isSidebar = computed(() => this.def.layoutType === 'sidebar-left' || this.def.layoutType === 'sidebar-right');
+  // Computed properties driven by def() + data()
+  theme = computed(() => COUNTRY_BY_CODE[this.def().countryCode ?? '']?.theme ?? 'silicon-valley');
+  sample = computed<SampleResume>(() => this.data() ?? sampleFor(this.def().category));
+  isSidebar = computed(() => this.def().layoutType === 'sidebar-left' || this.def().layoutType === 'sidebar-right');
   initials = computed(() =>
     this.sample().fullName.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase());
-  email = computed(() => this.sample().email ?? (this.sample().fullName.split(' ')[0].toLowerCase() + '@example.com'));
-  phone = computed(() => this.sample().phone ?? '+1 555 010 2024');
-  location = computed(() => {
-    if (this.sample().location) return this.sample().location!;
-    const cc = this.def.countryCode ?? '';
-    return ({
-      us: 'San Francisco, CA', ca: 'Toronto, ON', uk: 'London, UK',
-      de: 'Berlin, DE', fr: 'Paris, FR', it: 'Milan, IT', es: 'Madrid, ES',
-      nl: 'Amsterdam, NL', se: 'Stockholm, SE', no: 'Oslo, NO', ch: 'Zurich, CH',
-      au: 'Sydney, AU', nz: 'Auckland, NZ',
-      ae: 'Dubai, UAE', sa: 'Riyadh, KSA', qa: 'Doha, QA',
-      pk: 'Lahore, PK', in: 'Bengaluru, IN', bd: 'Dhaka, BD',
-      sg: 'Singapore', my: 'Kuala Lumpur, MY',
-      jp: 'Tokyo, JP', kr: 'Seoul, KR', cn: 'Shanghai, CN',
-      br: 'São Paulo, BR', mx: 'Mexico City, MX',
-      za: 'Cape Town, ZA', tr: 'Istanbul, TR', eg: 'Cairo, EG'
-    } as Record<string,string>)[cc] ?? 'San Francisco, CA';
-  });
+  // Use `||` (not `??`) so empty strings from the builder fall back too,
+  // preventing stray " · · " separators in the contact line.
+  email = computed(() => this.sample().email || (this.sample().fullName.split(' ')[0].toLowerCase() + '@example.com'));
+  phone = computed(() => this.sample().phone || '+1 555 010 2024');
+  location = computed(() => this.sample().location || locationForCountry(this.def().countryCode));
   summaryLabel = computed(() => {
-    const c = this.def.category;
+    const c = this.def().category;
     if (c === 'executive')      return 'Executive Summary';
     if (c === 'fresh-graduate' || c === 'internship') return 'Objective';
     if (c === 'graphic-designer' || c === 'product-designer' || c === 'ui-ux-designer' || c === 'creative') return 'About';

@@ -52,3 +52,20 @@ export const COUNTRIES: CountryMeta[] = [
 
 export const COUNTRY_BY_CODE: Record<string, CountryMeta> =
   Object.fromEntries(COUNTRIES.map(c => [c.code, c]));
+
+/** A representative city/region string for a country code — used to seed
+ *  sample contact details in previews and the resume builder. */
+export function locationForCountry(code: string | null | undefined): string {
+  return ({
+    us: 'San Francisco, CA', ca: 'Toronto, ON', uk: 'London, UK',
+    de: 'Berlin, DE', fr: 'Paris, FR', it: 'Milan, IT', es: 'Madrid, ES',
+    nl: 'Amsterdam, NL', se: 'Stockholm, SE', no: 'Oslo, NO', ch: 'Zurich, CH',
+    au: 'Sydney, AU', nz: 'Auckland, NZ',
+    ae: 'Dubai, UAE', sa: 'Riyadh, KSA', qa: 'Doha, QA',
+    pk: 'Lahore, PK', in: 'Bengaluru, IN', bd: 'Dhaka, BD',
+    sg: 'Singapore', my: 'Kuala Lumpur, MY',
+    jp: 'Tokyo, JP', kr: 'Seoul, KR', cn: 'Shanghai, CN',
+    br: 'São Paulo, BR', mx: 'Mexico City, MX',
+    za: 'Cape Town, ZA', tr: 'Istanbul, TR', eg: 'Cairo, EG'
+  } as Record<string, string>)[code ?? ''] ?? 'San Francisco, CA';
+}
