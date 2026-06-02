@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -23,7 +23,7 @@ interface EducationItem  { degree: string; school: string; year: string; }
         <!-- Header -->
         <header class="builder-head">
           <div>
-            <div class="badge">Free • Live preview</div>
+            <div class="badge">Free â€¢ Live preview</div>
             <h1>Resume Builder</h1>
             <p class="text-muted">Type on the left, see your CV update on the right in real time.</p>
           </div>
@@ -38,12 +38,12 @@ interface EducationItem  { degree: string; school: string; year: string; }
               <h4>{{ t.name }}</h4>
               <p class="text-muted">{{ COUNTRY_BY_CODE[t.countryCode ?? '']?.flag }} {{ catLabel(t.category) }}</p>
             </div>
-            <a routerLink="/templates" class="link" style="margin-left: auto;">Change →</a>
+            <a routerLink="/templates" class="link" style="margin-left: auto;">Change â†’</a>
           </div>
 
           <div class="template-chip template-chip--missing" *ngIf="!template() && !loading()">
             <p class="text-muted" style="margin: 0;">No template selected.</p>
-            <a routerLink="/templates" class="btn btn--primary btn--sm">Pick a template →</a>
+            <a routerLink="/templates" class="btn btn--primary btn--sm">Pick a template â†’</a>
           </div>
         </header>
 
@@ -58,7 +58,7 @@ interface EducationItem  { degree: string; school: string; year: string; }
               <input class="input" placeholder="Email"            [(ngModel)]="email">
               <input class="input" placeholder="Phone"            [(ngModel)]="phone">
               <input class="input" placeholder="Location"         [(ngModel)]="location">
-              <input class="input" placeholder="linkedin.com/in/…" [(ngModel)]="linkedin">
+              <input class="input" placeholder="linkedin.com/in/â€¦" [(ngModel)]="linkedin">
             </div>
 
             <h3>Summary</h3>
@@ -85,7 +85,7 @@ interface EducationItem  { degree: string; school: string; year: string; }
               <div class="grid grid-2">
                 <input class="input" placeholder="Degree" [(ngModel)]="ed.degree">
                 <input class="input" placeholder="School" [(ngModel)]="ed.school">
-                <input class="input" placeholder="Year (e.g. 2019 — 2023)" [(ngModel)]="ed.year">
+                <input class="input" placeholder="Year (e.g. 2019 â€” 2023)" [(ngModel)]="ed.year">
               </div>
               <button class="btn btn--ghost btn--sm" (click)="removeEducation(i)">Remove</button>
             </div>
@@ -93,10 +93,10 @@ interface EducationItem  { degree: string; school: string; year: string; }
 
             <h3>Skills</h3>
             <textarea class="textarea" rows="3" [(ngModel)]="skills"
-                      placeholder="Comma-separated: TypeScript, Angular, RxJS, …"></textarea>
+                      placeholder="Comma-separated: TypeScript, Angular, RxJS, â€¦"></textarea>
 
             <div class="builder__cta">
-              <button class="btn btn--primary" (click)="print()">⬇ Download as PDF</button>
+              <button class="btn btn--primary" (click)="print()">â¬‡ Download as PDF</button>
               <button class="btn btn--ghost" (click)="clearAll()">Start blank</button>
             </div>
           </div>
@@ -110,10 +110,10 @@ interface EducationItem  { degree: string; school: string; year: string; }
               <div class="preview-frame preview-frame--empty">
                 <div *ngIf="loading()" class="skel-shimmer" style="width:100%;height:100%;"></div>
                 <div *ngIf="!loading()" style="padding: 3rem; text-align: center;">
-                  <div style="font-size: 2.5rem; margin-bottom: .8rem;">🎨</div>
+                  <div style="font-size: 2.5rem; margin-bottom: .8rem;">ðŸŽ¨</div>
                   <h3>Pick a template to begin</h3>
                   <p class="text-muted" style="margin: .4rem 0 1rem;">Choose from 50 designs across 29 countries.</p>
-                  <a routerLink="/templates" class="btn btn--primary">Browse templates →</a>
+                  <a routerLink="/templates" class="btn btn--primary">Browse templates â†’</a>
                 </div>
               </div>
             </ng-template>
@@ -219,7 +219,7 @@ export class ResumeBuilderComponent implements OnInit {
   /** Real user data shaped as SampleResume for the preview component.
    *  Implemented as a plain method (not a computed signal) so Angular's
    *  change detection picks up changes to the plain string fields (name,
-   *  title, …) on every keystroke — no manual signal bumping required.
+   *  title, â€¦) on every keystroke â€” no manual signal bumping required.
    *  When fields are blank we fall back to the template's sample data so
    *  the user immediately sees what the design looks like. */
   resumeData(): SampleResume | null {
@@ -242,7 +242,7 @@ export class ResumeBuilderComponent implements OnInit {
         .map(e => ({
           role:    e.role || 'Role',
           company: e.company || 'Company',
-          dates:   [e.from, e.to].filter(Boolean).join(' — '),
+          dates:   [e.from, e.to].filter(Boolean).join(' â€” '),
           bullets: (e.bullets || '').split('\n').map(s => s.trim()).filter(Boolean)
         })),
       education: this.education()
@@ -256,12 +256,12 @@ export class ResumeBuilderComponent implements OnInit {
     };
   }
 
-  /** The sample the form was seeded from — source of carry-through extras. */
+  /** The sample the form was seeded from â€” source of carry-through extras. */
   private sampleRef: SampleResume | null = null;
 
   ngOnInit(): void {
     this.seo.apply({
-      title:       'Free Resume Builder — ATS-Friendly Templates | CVSpeak',
+      title:       'Free Resume Builder â€” ATS-Friendly Templates | CVSpeak',
       description: 'Build an ATS-friendly resume step by step with a live themed preview. Free, no signup. Export as PDF.',
       canonical:   '/resume-builder'
     });
@@ -307,7 +307,7 @@ export class ResumeBuilderComponent implements OnInit {
     this.summary  = s.summary;
     this.skills   = s.skills;
     this.experience.set(s.experience.map(e => {
-      const [from, to] = (e.dates || '').split(/[—–-]/).map(x => x.trim());
+      const [from, to] = (e.dates || '').split(/[â€”â€“-]/).map(x => x.trim());
       return { role: e.role, company: e.company, from: from || '', to: to || '', bullets: e.bullets.join('\n') };
     }));
     const edu = Array.isArray(s.education) ? s.education : [s.education];
