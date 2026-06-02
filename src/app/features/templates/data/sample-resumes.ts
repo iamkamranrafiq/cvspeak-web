@@ -25,7 +25,10 @@ export interface SampleResume {
   summary: string;
   skills: string;
   experience: ExperienceEntry[];
-  education: EducationEntry;
+  /** One or more education entries. A single object is also accepted. */
+  education: EducationEntry | EducationEntry[];
+  /** Optional punchy highlights rendered as a "Key Achievements" section. */
+  achievements?: string[];
   /** Optional certifications / licenses — rendered as its own section. */
   certifications?: string[];
   /** Optional contact overrides. When provided (e.g. by the Resume Builder),
@@ -40,23 +43,38 @@ export interface SampleResume {
 const DEFAULT_SE: SampleResume = {
   fullName: 'Alex Morgan',
   title:    'Senior Software Engineer',
-  summary:  'Senior engineer with 8 years building distributed systems that serve 40M+ daily users. Shipped the platform behind $180M ARR; led the migration that cut infra spend 31%.',
-  skills:   'TypeScript · Go · Rust · React · PostgreSQL · Kubernetes · AWS · gRPC · Kafka · Terraform · System design',
+  summary:  'Senior engineer with 8 years building distributed systems that serve 40M+ daily users. Shipped the platform behind $180M ARR, led the migration that cut infra spend 31%, and mentored a generation of engineers along the way.',
+  skills:   'TypeScript · Go · Rust · React · Next.js · Node.js · PostgreSQL · Redis · Kubernetes · AWS · GCP · gRPC · Kafka · Terraform · System design',
+  achievements: [
+    'Scaled the payments platform from 4M to 40M daily users with zero SLA breaches.',
+    'Cut cloud spend $2.1M/year through workload right-sizing and caching.',
+    'Filed 2 patents on distributed reconciliation; speaker at KubeCon 2024.'
+  ],
   experience: [
     { role: 'Senior Software Engineer', company: 'Stripe', dates: '2022 — Present',
       bullets: [
         'Owned the billing reconciliation pipeline processing $2.4B / quarter with 99.997% accuracy.',
         'Cut p95 latency 42% by replacing chatty REST with a typed RPC gateway and read-replica routing.',
+        'Designed the idempotency layer now used by 30+ internal services.',
         'Mentored 5 engineers; two promoted to Senior within 14 months.'
       ] },
     { role: 'Software Engineer', company: 'Airbnb', dates: '2019 — 2022',
       bullets: [
         'Designed the event-sourced inventory service powering 7M live listings.',
-        'Led the monolith → 14 services migration with zero customer-facing downtime.'
+        'Led the monolith → 14 services migration with zero customer-facing downtime.',
+        'Built the feature-flag platform adopted by every product team.'
+      ] },
+    { role: 'Software Engineer', company: 'Palantir', dates: '2017 — 2019',
+      bullets: [
+        'Shipped the data-integration framework still used across 40+ deployments.',
+        'Owned the on-call rotation and cut paging volume 55% with better alerting.'
       ] }
   ],
-  education: { degree: 'B.S. Computer Science', school: 'Carnegie Mellon University', dates: '2015 — 2019', detail: 'GPA 3.9 · Dean’s List' },
-  certifications: ['AWS Certified Solutions Architect – Professional', 'Certified Kubernetes Administrator (CKA)']
+  education: [
+    { degree: 'M.S. Computer Science', school: 'Stanford University', dates: '2015 — 2017', detail: 'Specialisation in Distributed Systems' },
+    { degree: 'B.S. Computer Science', school: 'Carnegie Mellon University', dates: '2011 — 2015', detail: 'GPA 3.9 · Dean’s List' }
+  ],
+  certifications: ['AWS Certified Solutions Architect – Professional', 'Certified Kubernetes Administrator (CKA)', 'HashiCorp Terraform Associate']
 };
 
 export const SAMPLE_RESUMES: Record<string, SampleResume> = {
@@ -65,7 +83,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'frontend-developer': {
     fullName: 'Maya Patel', title: 'Senior Frontend Engineer',
     summary:  'Frontend specialist obsessed with perceived performance. Shipped 4 design systems used by 200+ engineers and reduced TTI 38% across the consumer surface.',
-    skills:   'React · TypeScript · Next.js · Tailwind · Storybook · Web Vitals · a11y · Framer Motion · Figma',
+    skills:   'React · TypeScript · Next.js · Vue · Tailwind · Storybook · Web Vitals · Accessibility · Framer Motion · GraphQL · Vite · Figma',
+    achievements: [
+      'Lifted Lighthouse performance from 64 → 98 across the storefront.',
+      'Cut JavaScript bundle size 41% with route-level code splitting.',
+      'Open-source design-system maintainer with 3.2k GitHub stars.'
+    ],
     experience: [
       { role: 'Senior Frontend Engineer', company: 'Shopify', dates: '2022 — Present',
         bullets: [
@@ -85,7 +108,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'backend-developer': {
     fullName: 'Daniel Wright', title: 'Senior Backend Engineer',
     summary:  'Backend engineer with deep expertise in data-intensive APIs. Built systems handling 250K writes/sec at peak. Comfortable from query planner internals to service mesh config.',
-    skills:   'Go · Rust · PostgreSQL · Redis · gRPC · Kafka · Terraform · OpenTelemetry · Linux internals',
+    skills:   'Go · Rust · Java · PostgreSQL · Redis · gRPC · Kafka · RabbitMQ · Terraform · OpenTelemetry · Docker · Linux internals',
+    achievements: [
+      'Designed an ingestion pipeline sustaining 8.4M events/sec across 12 regions.',
+      'Cut cold-start ingest latency from 380ms → 90ms via custom runtime tuning.',
+      'Authored an internal SDK adopted by 240+ microservices.'
+    ],
     experience: [
       { role: 'Senior Backend Engineer', company: 'Datadog', dates: '2021 — Present',
         bullets: [
@@ -106,7 +134,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'devops-engineer': {
     fullName: 'Klaus Weber', title: 'Senior DevOps Engineer',
     summary:  'Platform engineer with deep Kubernetes + AWS expertise. Cut deploy times 80% across 12 teams. Owned the migration to multi-region active-active.',
-    skills:   'Kubernetes · Terraform · AWS · GCP · Helm · ArgoCD · Prometheus · Grafana · Istio · Vault',
+    skills:   'Kubernetes · Terraform · AWS · GCP · Helm · ArgoCD · Prometheus · Grafana · Istio · Vault · Docker · Python · Go',
+    achievements: [
+      'Migrated 340 services to active-active across 3 regions at 99.99% SLO.',
+      'Cut average deploy time from 22 min → 4 min via parallelised pipelines.',
+      'Saved €1.8M/year right-sizing 4,200 Kubernetes workloads.'
+    ],
     experience: [
       { role: 'Senior DevOps Engineer', company: 'Spotify', dates: '2021 — Present',
         bullets: [
@@ -139,7 +172,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'data-scientist': {
     fullName: 'Priya Iyer', title: 'Senior Data Scientist',
     summary:  'Data scientist with 7 years applying ML to marketplace & growth problems. Lifted ad CTR 22% via causal uplift modelling; built the search-ranking model behind $180M GMV.',
-    skills:   'Python · PyTorch · TensorFlow · SQL · dbt · Causal inference · Bayesian models · MLflow · Spark · Airflow',
+    skills:   'Python · PyTorch · TensorFlow · SQL · dbt · Causal inference · Bayesian models · MLflow · Spark · Airflow · A/B testing · Tableau',
+    achievements: [
+      'Built the surge-pricing model live in 38 cities; lifted gross bookings 8.4%.',
+      'Productionised the first uplift-based ad-pricing system ($24M incremental).',
+      'Filed 3 patents on counterfactual evaluation methods.'
+    ],
     experience: [
       { role: 'Senior Data Scientist', company: 'Uber', dates: '2021 — Present',
         bullets: [
@@ -157,7 +195,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'ai-engineer': {
     fullName: 'Mateo Ribeiro', title: 'Senior AI / ML Engineer',
     summary:  'Applied ML engineer shipping LLM-powered products at scale. Built the RAG stack powering a 4M-user assistant serving 12M queries/day at p95 < 600ms.',
-    skills:   'PyTorch · Transformers · LangChain · vLLM · Vector DBs · CUDA · Triton · MLOps · RLHF',
+    skills:   'PyTorch · Transformers · LangChain · vLLM · Vector DBs · CUDA · Triton · MLOps · RLHF · Python · Ray · Kubernetes',
+    achievements: [
+      'Cut GPU inference costs 38% with speculative decoding + adaptive batching.',
+      'Co-authored a published paper on long-context retrieval evaluation.',
+      'Shipped the RAG stack behind a 4M-user assistant (12M queries/day).'
+    ],
     experience: [
       { role: 'Senior ML Engineer', company: 'Anthropic', dates: '2023 — Present',
         bullets: [
@@ -221,7 +264,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'ui-ux-designer': {
     fullName: 'Sofia Marchetti', title: 'Senior Product Designer',
     summary:  'Product designer obsessed with reducing cognitive load. I ship interfaces measured in retention, not impressions. Led the redesign that lifted activation 31%.',
-    skills:   'Figma · Framer · Prototyping · Design systems · Motion · User research · Service design · Copywriting',
+    skills:   'Figma · Framer · Prototyping · Design systems · Motion · User research · Service design · Usability testing · Copywriting · Webflow',
+    achievements: [
+      'Led the onboarding redesign that lifted activation 31% across 14K teams.',
+      'Built the cross-platform design system used by 90+ engineers.',
+      'Speaker at Config 2024; design principles cited in 4 industry talks.'
+    ],
     experience: [
       { role: 'Senior Product Designer', company: 'Linear', dates: '2022 — Present',
         bullets: [
@@ -238,7 +286,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'graphic-designer': {
     fullName: 'Camille Laurent', title: 'Senior Graphic Designer',
     summary:  'Editorial designer with a typographic obsession. Brand systems for 30+ launches including 3 covered by It’s Nice That and Eye on Design.',
-    skills:   'Adobe Creative Cloud · Branding · Editorial · Typography · Print production · Motion · Identity systems',
+    skills:   'Adobe Creative Cloud · Illustrator · InDesign · Photoshop · Branding · Editorial · Typography · Print production · Motion · Identity systems',
+    achievements: [
+      'Designed the wordmark + brand system for a $400M IPO.',
+      '3 identity projects featured in Eye on Design and It’s Nice That.',
+      'Mentored 4 designers across the London and NYC studios.'
+    ],
     experience: [
       { role: 'Senior Graphic Designer', company: 'Pentagram', dates: '2021 — Present',
         bullets: [
@@ -272,7 +325,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'marketing': {
     fullName: 'James Whitmore', title: 'Senior Marketing Manager',
     summary:  'B2B marketer with 10 years driving pipeline at category-leading SaaS. Built integrated programs that returned 4.3× pipeline and closed $12M from 40 named accounts.',
-    skills:   'Demand gen · ABM · Brand · Content · Lifecycle · HubSpot · Marketo · Salesforce · GA4 · Attribution',
+    skills:   'Demand gen · ABM · Brand · Content · Lifecycle · SEO · HubSpot · Marketo · Salesforce · GA4 · Webflow · Attribution',
+    achievements: [
+      'Built the ABM program that closed $12M from 40 target accounts (4.3× ROI).',
+      'Launched a brand campaign covered by The Verge, TechCrunch and WSJ.',
+      'Scaled influenced pipeline from $0 → $8M in 12 months.'
+    ],
     experience: [
       { role: 'Senior Marketing Manager', company: 'Snowflake', dates: '2021 — Present',
         bullets: [
@@ -315,7 +373,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'sales': {
     fullName: 'Robert King', title: 'Enterprise Account Executive',
     summary:  'Enterprise AE closing 7-figure SaaS contracts. 142% of quota three years running. Top 5% globally across 320-AE org.',
-    skills:   'MEDDPICC · Enterprise sales · Salesforce · Outreach · Gong · Sales engineering partnering · C-level negotiation',
+    skills:   'MEDDPICC · Enterprise sales · Pipeline generation · Salesforce · Outreach · Gong · Forecasting · C-level negotiation · Solution selling',
+    achievements: [
+      'Closed $14.2M new ARR (142% of quota) — top 5% globally.',
+      'Landed the largest EMEA new logo: $3.4M ACV, 3-year commit.',
+      'Mentored 6 reps; 4 promoted to senior within 18 months.'
+    ],
     experience: [
       { role: 'Enterprise Account Executive', company: 'Salesforce', dates: '2021 — Present',
         bullets: [
@@ -372,7 +435,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'product-manager': {
     fullName: 'Aisha Bello', title: 'Senior Product Manager',
     summary:  'PM shipping data-heavy B2B SaaS. Took a $4M ARR product to $42M ARR in 30 months. 3 launches covered by TechCrunch.',
-    skills:   'Product strategy · Discovery · SQL · A/B testing · Roadmapping · Stakeholder mgmt · OKR design · GTM',
+    skills:   'Product strategy · Discovery · SQL · A/B testing · Roadmapping · Stakeholder mgmt · OKR design · GTM · Figma · Amplitude · Jira',
+    achievements: [
+      'Grew Billing for SaaS from $4M → $42M ARR in 30 months.',
+      'Shipped the metered-pricing engine used by 9 of the top 10 AI startups.',
+      'Killed 6 false starts through a rigorous discovery program.'
+    ],
     experience: [
       { role: 'Senior Product Manager', company: 'Stripe', dates: '2022 — Present',
         bullets: [
@@ -579,13 +647,23 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'doctor': {
     fullName: 'Dr. Imran Khan', title: 'Internal Medicine Physician',
     summary:  'Board-certified internal medicine physician with 9 years of acute-care experience across two teaching hospitals. Published in NEJM and JAMA Internal Medicine.',
-    skills:   'Internal Medicine · ICU · EHR (Epic) · Clinical research · Medical education · Patient advocacy · ACLS · USMLE',
+    skills:   'Internal Medicine · ICU · Acute care · EHR (Epic) · Clinical research · Medical education · Quality improvement · Patient advocacy · ACLS',
+    achievements: [
+      'Designed a rapid-response protocol that cut code-blue events 31%.',
+      'Co-authored a NEJM paper on sepsis bundles cited 240+ times.',
+      'Awarded “Teacher of the Year” by internal-medicine residents (2023).'
+    ],
     experience: [
       { role: 'Attending Physician — Internal Medicine', company: 'Massachusetts General Hospital', dates: '2020 — Present',
         bullets: [
           'Lead attending across 38-bed teaching unit; oversee 12 residents per rotation.',
           'Co-authored a NEJM paper on sepsis bundles cited 240+ times.',
           'Designed the rapid-response protocol that cut code-blue events 31%.'
+        ] },
+      { role: 'Internal Medicine Resident', company: 'Johns Hopkins Hospital', dates: '2015 — 2020',
+        bullets: [
+          'Completed residency at a top-3 US program; chief resident in final year.',
+          'Ran the resident QI committee; led 3 unit-level safety initiatives.'
         ] }
     ],
     education: { degree: 'M.D.', school: 'Harvard Medical School', dates: '2011 — 2015' },
@@ -729,7 +807,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   'fresh-graduate': {
     fullName: 'Jamie Carter', title: 'Computer Science Graduate',
     summary:  'Recent CS graduate from a top-10 program with FAANG internship experience. Strong foundation in distributed systems and full-stack web. Seeking new-grad SWE role.',
-    skills:   'Python · Java · TypeScript · SQL · React · Spring Boot · Git · Algorithms · System design · LeetCode (top 5%)',
+    skills:   'Python · Java · TypeScript · C++ · SQL · React · Node.js · Spring Boot · Git · Docker · Algorithms · System design',
+    achievements: [
+      'Returned offer from Google after a high-impact Search-infra internship.',
+      'Hackathon winner (TartanHacks 2024) — built an ML study-planner in 36h.',
+      'Top 5% on LeetCode; 400+ problems solved.'
+    ],
     experience: [
       { role: 'Software Engineering Intern', company: 'Google', dates: 'Summer 2024',
         bullets: [
@@ -754,7 +837,12 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
   },
   'executive':  { ...DEFAULT_SE, fullName: 'Margaret Holloway', title: 'Chief Operating Officer',
     summary: 'Operating executive with 19 years scaling product orgs from 50 to 2,000. Two successful exits; public-company board experience.',
-    skills:  'Strategy · Operations · M&A integration · Board governance · P&L ownership · Org design · Public-company IR',
+    skills:  'Strategy · Operations · M&A integration · Board governance · P&L ownership · Org design · GTM · Capital allocation · Public-company IR',
+    achievements: [
+      'Operating partner from $700M → $2.6B ARR, through a successful IPO.',
+      'Integrated 3 acquisitions totalling $1.2B in deal value.',
+      'Serve on the board of 2 public technology companies.'
+    ],
     experience: [
       { role: 'Chief Operating Officer', company: 'Datadog', dates: '2021 — Present',
         bullets: [
@@ -819,6 +907,11 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
 
 export function sampleFor(category: string): SampleResume {
   return SAMPLE_RESUMES[category] ?? DEFAULT_SE;
+}
+
+/** Normalise the education field (object or array) to an array. */
+export function eduList(s: SampleResume): EducationEntry[] {
+  return Array.isArray(s.education) ? s.education : [s.education];
 }
 
 /** Split a "·"/","-separated skills string into individual skill names. */

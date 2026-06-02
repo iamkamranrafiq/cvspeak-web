@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
-import { sampleFor, SampleResume, skillBarsFrom, splitSkills } from '@features/templates/data/sample-resumes';
+import { eduList, sampleFor, SampleResume, skillBarsFrom, splitSkills } from '@features/templates/data/sample-resumes';
 import { COUNTRY_BY_CODE, locationForCountry } from '@features/templates/data/countries';
 import { TemplateSummary } from '@core/models/api.models';
 
@@ -23,10 +23,12 @@ import { TemplateSummary } from '@core/models/api.models';
   selector: 'app-template-preview',
   standalone: true,
   imports: [CommonModule],
+  host: { '[class.is-full]': '!thumb()' },
   template: `
     <div class="tp"
          [class]="'tp--arch-' + archetype()"
          [class.tp--thumb]="thumb()"
+         [class.tp--full]="!thumb()"
          [class.tp--serif]="serifHead()"
          [class.tp--side-right]="sideRight()"
          [style.--tp-primary]="def().palette?.primary || '#1e1b4b'"
@@ -81,6 +83,10 @@ import { TemplateSummary } from '@core/models/api.models';
               <h2>{{ summaryLabel() }}</h2>
               <p class="lede">{{ s().summary }}</p>
             </section>
+            <section class="block" *ngIf="s().achievements?.length">
+              <h2>Key Achievements</h2>
+              <ul class="ach"><li *ngFor="let a of s().achievements">{{ a }}</li></ul>
+            </section>
             <section class="block">
               <h2>Experience</h2>
               <div class="tl">
@@ -96,8 +102,11 @@ import { TemplateSummary } from '@core/models/api.models';
             </section>
             <section class="block">
               <h2>Education</h2>
-              <div class="tl__head"><strong>{{ s().education.degree }}</strong><span class="muted">{{ s().education.dates }}</span></div>
-              <div class="tl__sub">{{ s().education.school }}</div>
+              <div *ngFor="let ed of edu()" style="margin-bottom:6px;">
+                <div class="tl__head"><strong>{{ ed.degree }}</strong><span class="muted">{{ ed.dates }}</span></div>
+                <div class="tl__sub">{{ ed.school }}</div>
+                <div class="muted" *ngIf="ed.detail" style="font-size:9.5px;">{{ ed.detail }}</div>
+              </div>
             </section>
           </main>
         </div>
@@ -119,6 +128,10 @@ import { TemplateSummary } from '@core/models/api.models';
           </header>
           <main class="hdr__body">
             <section class="block"><h2>{{ summaryLabel() }}</h2><p class="lede">{{ s().summary }}</p></section>
+            <section class="block" *ngIf="s().achievements?.length">
+              <h2>Key Achievements</h2>
+              <ul class="ach"><li *ngFor="let a of s().achievements">{{ a }}</li></ul>
+            </section>
             <section class="block">
               <h2>Experience</h2>
               <div class="exp" *ngFor="let e of s().experience">
@@ -128,7 +141,10 @@ import { TemplateSummary } from '@core/models/api.models';
             </section>
             <section class="block">
               <h2>Education</h2>
-              <div class="exp__head"><strong>{{ s().education.degree }}</strong><span class="exp__co">· {{ s().education.school }}</span><span class="muted exp__date">{{ s().education.dates }}</span></div>
+              <div class="exp" *ngFor="let ed of edu()">
+                <div class="exp__head"><strong>{{ ed.degree }}</strong><span class="exp__co">· {{ ed.school }}</span><span class="muted exp__date">{{ ed.dates }}</span></div>
+                <div class="muted" *ngIf="ed.detail" style="font-size:9.5px;">{{ ed.detail }}</div>
+              </div>
             </section>
             <section class="block">
               <h2>Skills</h2>
@@ -158,6 +174,10 @@ import { TemplateSummary } from '@core/models/api.models';
             <div class="rule"></div>
           </header>
           <section class="block"><h2>{{ summaryLabel() }}</h2><p class="lede">{{ s().summary }}</p></section>
+          <section class="block" *ngIf="s().achievements?.length">
+            <h2>Key Achievements</h2>
+            <ul class="ach"><li *ngFor="let a of s().achievements">{{ a }}</li></ul>
+          </section>
           <section class="block">
             <h2>Experience</h2>
             <div class="tl tl--marked">
@@ -170,8 +190,9 @@ import { TemplateSummary } from '@core/models/api.models';
           <section class="block">
             <h2>Education</h2>
             <div class="tl tl--marked">
-              <div class="tl__item">
-                <div class="tl__head"><strong>{{ s().education.degree }}</strong><span class="tl__co">· {{ s().education.school }}</span><span class="muted tl__date">{{ s().education.dates }}</span></div>
+              <div class="tl__item" *ngFor="let ed of edu()">
+                <div class="tl__head"><strong>{{ ed.degree }}</strong><span class="tl__co">· {{ ed.school }}</span><span class="muted tl__date">{{ ed.dates }}</span></div>
+                <div class="muted" *ngIf="ed.detail" style="font-size:9.5px;">{{ ed.detail }}</div>
               </div>
             </div>
           </section>
@@ -198,6 +219,10 @@ import { TemplateSummary } from '@core/models/api.models';
             <div class="eleg__rule"></div>
           </header>
           <section class="block"><h2>{{ summaryLabel() }}</h2><p class="lede">{{ s().summary }}</p></section>
+          <section class="block" *ngIf="s().achievements?.length">
+            <h2>Key Achievements</h2>
+            <ul class="ach ach--center"><li *ngFor="let a of s().achievements">{{ a }}</li></ul>
+          </section>
           <section class="block">
             <h2>Experience</h2>
             <div class="eleg__exp" *ngFor="let e of s().experience">
@@ -208,8 +233,10 @@ import { TemplateSummary } from '@core/models/api.models';
           </section>
           <section class="block">
             <h2>Education</h2>
-            <div class="eleg__exp-head"><strong>{{ s().education.degree }}</strong><span class="muted">{{ s().education.dates }}</span></div>
-            <div class="eleg__co">{{ s().education.school }}</div>
+            <div class="eleg__exp" *ngFor="let ed of edu()">
+              <div class="eleg__exp-head"><strong>{{ ed.degree }}</strong><span class="muted">{{ ed.dates }}</span></div>
+              <div class="eleg__co">{{ ed.school }}<span *ngIf="ed.detail"> · {{ ed.detail }}</span></div>
+            </div>
           </section>
           <section class="block"><h2>Skills</h2><p class="eleg__skills">{{ s().skills }}</p></section>
           <section class="block" *ngIf="s().certifications?.length">
@@ -222,6 +249,9 @@ import { TemplateSummary } from '@core/models/api.models';
   `,
   styles: [`
     :host { display: block; width: 100%; height: 100%; }
+    /* Full-size mode (builder / detail): grow to fit content so multi-page
+       resumes are fully visible instead of clipped to one page. */
+    :host(.is-full) { height: auto; }
 
     .tp {
       width: 100%; height: 100%;
@@ -232,6 +262,7 @@ import { TemplateSummary } from '@core/models/api.models';
       font-size: 11px;
       line-height: 1.5;
     }
+    .tp--full { height: auto; min-height: 100%; overflow: visible; }
     .tp--serif h1, .tp--serif h2, .tp--serif h4 {
       font-family: 'Source Serif Pro', Georgia, 'Times New Roman', serif;
     }
@@ -255,6 +286,15 @@ import { TemplateSummary } from '@core/models/api.models';
     .certs { margin: 4px 0 0; padding-left: 15px; }
     .certs li { margin-bottom: 3px; }
     .side__cert { font-size: 9px; color: rgba(255,255,255,.9); margin: 0 0 5px; line-height: 1.4; }
+
+    /* key achievements */
+    .ach { list-style: none; padding: 0; margin: 0; }
+    .ach li { position: relative; padding-left: 16px; margin-bottom: 4px; }
+    .ach li::before {
+      content: '★'; position: absolute; left: 0; top: 0;
+      color: var(--tp-accent); font-size: 9px;
+    }
+    .ach--center { max-width: 92%; margin: 0 auto; }
 
     /* pills */
     .pills { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -403,9 +443,12 @@ export class TemplatePreviewComponent {
   location = computed(() => this.s().location || locationForCountry(this.def().countryCode));
   linkedin = computed(() => this.s().linkedin || ('linkedin.com/in/' + this.s().fullName.toLowerCase().replace(/[^a-z]+/g, '')));
 
+  // ----- Education (object or array → array) -----
+  edu = computed(() => eduList(this.s()));
+
   // ----- Skills / languages -----
-  skillBars = computed(() => skillBarsFrom(this.s().skills, 5));
-  skillTags = computed(() => splitSkills(this.s().skills, 9));
+  skillBars = computed(() => skillBarsFrom(this.s().skills, 6));
+  skillTags = computed(() => splitSkills(this.s().skills, 12));
   languages = computed(() =>
     (this.def().supportedLanguages?.length ? this.def().supportedLanguages : ['English'])
       .slice(0, 4)

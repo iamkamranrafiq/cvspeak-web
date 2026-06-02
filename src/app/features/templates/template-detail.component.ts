@@ -161,13 +161,15 @@ import { COUNTRY_BY_CODE } from './data/countries';
     .detail { display: grid; grid-template-columns: 1.05fr 1fr; gap: 3rem; align-items: start; }
     .detail__preview { position: relative; }
     .preview-frame {
-      aspect-ratio: 8.5 / 11;
-      background: #f4f4f6;
+      background: #fff;
       border-radius: .9rem;
       overflow: hidden;
       border: 1px solid var(--border-soft);
       box-shadow: 0 30px 80px rgba(0,0,0,.18), 0 4px 12px rgba(0,0,0,.06);
+      min-height: 600px;
       position: sticky; top: 80px;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
     }
     .preview-actions { display: flex; justify-content: center; margin-top: .75rem; }
     .preview-action-label { font-size: .78rem; color: var(--text-muted); }

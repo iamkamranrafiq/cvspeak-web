@@ -153,17 +153,27 @@ interface EducationItem  { degree: string; school: string; year: string; }
     .btn--sm { padding: .35rem .8rem; font-size: .82rem; margin-top: .5rem; }
     .builder__cta { margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid var(--border-soft); display: flex; gap: .6rem; flex-wrap: wrap; }
 
-    .builder__preview { position: sticky; top: 84px; }
+    /* Sticky, independently scrollable preview pane so page 2+ is reachable
+       while the form scrolls separately. */
+    .builder__preview {
+      position: sticky; top: 84px;
+      max-height: calc(100vh - 104px);
+      overflow-y: auto;
+      border-radius: .9rem;
+      padding: 2px;
+    }
     .preview-frame {
-      aspect-ratio: 8.5 / 11;
-      background: #f4f4f6;
+      background: #fff;
       border-radius: .9rem; overflow: hidden;
       border: 1px solid var(--border-soft);
       box-shadow: 0 30px 80px rgba(0,0,0,.18), 0 4px 12px rgba(0,0,0,.06);
+      min-height: 600px;            /* paper-like minimum even when short */
     }
     .preview-frame--empty {
+      aspect-ratio: 8.5 / 11;
       display: flex; align-items: center; justify-content: center;
       background: var(--surface-1);
+      min-height: 0;
     }
     .skel-shimmer {
       background: linear-gradient(90deg, #eee 0%, #f5f5f7 50%, #eee 100%);
@@ -176,8 +186,11 @@ interface EducationItem  { degree: string; school: string; year: string; }
     @media print {
       body * { visibility: hidden; }
       #preview, #preview * { visibility: visible; }
-      #preview { position: absolute; left: 0; top: 0; width: 100%; }
-      .preview-frame { box-shadow: none; border: 0; aspect-ratio: auto; }
+      #preview {
+        position: absolute; left: 0; top: 0; width: 100%;
+        max-height: none; overflow: visible;   /* let the full CV paginate */
+      }
+      .preview-frame { box-shadow: none; border: 0; min-height: 0; }
     }
 
     @media (max-width: 960px) {
@@ -232,15 +245,19 @@ export class ResumeBuilderComponent implements OnInit {
           dates:   [e.from, e.to].filter(Boolean).join(' — '),
           bullets: (e.bullets || '').split('\n').map(s => s.trim()).filter(Boolean)
         })),
-      education: this.education()[0]
-        ? {
-            degree: this.education()[0].degree || '',
-            school: this.education()[0].school || '',
-            dates:  this.education()[0].year   || ''
-          }
-        : { degree: '', school: '', dates: '' }
+      education: this.education()
+        .filter(e => e.degree || e.school)
+        .map(e => ({ degree: e.degree || '', school: e.school || '', dates: e.year || '' })),
+      // Achievements & certifications aren't editable in the form yet, so we
+      // carry them through from the originally-loaded sample to keep the
+      // preview full and consistent with what the template advertises.
+      achievements:   this.sampleRef?.achievements,
+      certifications: this.sampleRef?.certifications
     };
   }
+
+  /** The sample the form was seeded from — source of carry-through extras. */
+  private sampleRef: SampleResume | null = null;
 
   ngOnInit(): void {
     this.seo.apply({
@@ -279,6 +296,7 @@ export class ResumeBuilderComponent implements OnInit {
   /** Fill every form field from the template's sample candidate. */
   private prefillFromSample(t: TemplateSummary): void {
     const s = sampleFor(t.category);
+    this.sampleRef = s;
     const handle = s.fullName.toLowerCase().replace(/[^a-z]+/g, '');
     this.name     = s.fullName;
     this.title    = s.title;
@@ -292,12 +310,14 @@ export class ResumeBuilderComponent implements OnInit {
       const [from, to] = (e.dates || '').split(/[—–-]/).map(x => x.trim());
       return { role: e.role, company: e.company, from: from || '', to: to || '', bullets: e.bullets.join('\n') };
     }));
-    this.education.set([{ degree: s.education.degree, school: s.education.school, year: s.education.dates }]);
+    const edu = Array.isArray(s.education) ? s.education : [s.education];
+    this.education.set(edu.map(ed => ({ degree: ed.degree, school: ed.school, year: ed.dates })));
   }
 
   /** Wipe the form to a blank slate (keeps the selected template). */
   clearAll(): void {
     this.userEdited = true;
+    this.sampleRef = null;
     this.name = this.title = this.email = this.phone = this.location = this.linkedin = '';
     this.summary = this.skills = '';
     this.experience.set([{ role: '', company: '', from: '', to: '', bullets: '' }]);
