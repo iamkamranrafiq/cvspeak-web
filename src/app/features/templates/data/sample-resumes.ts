@@ -26,6 +26,8 @@ export interface SampleResume {
   skills: string;
   experience: ExperienceEntry[];
   education: EducationEntry;
+  /** Optional certifications / licenses — rendered as its own section. */
+  certifications?: string[];
   /** Optional contact overrides. When provided (e.g. by the Resume Builder),
    *  the preview uses these instead of the generated example contact strings. */
   email?:    string;
@@ -53,7 +55,8 @@ const DEFAULT_SE: SampleResume = {
         'Led the monolith → 14 services migration with zero customer-facing downtime.'
       ] }
   ],
-  education: { degree: 'B.S. Computer Science', school: 'Carnegie Mellon University', dates: '2015 — 2019', detail: 'GPA 3.9 · Dean’s List' }
+  education: { degree: 'B.S. Computer Science', school: 'Carnegie Mellon University', dates: '2015 — 2019', detail: 'GPA 3.9 · Dean’s List' },
+  certifications: ['AWS Certified Solutions Architect – Professional', 'Certified Kubernetes Administrator (CKA)']
 };
 
 export const SAMPLE_RESUMES: Record<string, SampleResume> = {
@@ -114,7 +117,8 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
       { role: 'Site Reliability Engineer', company: 'Klarna', dates: '2018 — 2021',
         bullets: ['Built the chaos-engineering platform now mandatory for tier-1 services.'] }
     ],
-    education: { degree: 'M.Sc. Distributed Systems', school: 'TU Munich', dates: '2015 — 2017' }
+    education: { degree: 'M.Sc. Distributed Systems', school: 'TU Munich', dates: '2015 — 2017' },
+    certifications: ['Certified Kubernetes Administrator (CKA)', 'HashiCorp Terraform Associate', 'AWS DevOps Engineer – Professional']
   },
 
   'cloud-architect': {
@@ -146,7 +150,8 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
       { role: 'Data Scientist', company: 'Allianz', dates: '2018 — 2021',
         bullets: ['Reduced claims-fraud false positives 41% with gradient-boosted churn models.'] }
     ],
-    education: { degree: 'M.Sc. Statistics', school: 'University of Edinburgh', dates: '2016 — 2018', detail: 'First Class Honours' }
+    education: { degree: 'M.Sc. Statistics', school: 'University of Edinburgh', dates: '2016 — 2018', detail: 'First Class Honours' },
+    certifications: ['AWS Certified Machine Learning – Specialty', 'Databricks Certified ML Professional', 'TensorFlow Developer Certificate']
   },
 
   'ai-engineer': {
@@ -178,7 +183,8 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
           'Led the response to a state-sponsored intrusion attempt with zero customer impact.'
         ] }
     ],
-    education: { degree: 'B.S. Computer Engineering', school: 'Technion — Israel Institute of Technology', dates: '2014 — 2018' }
+    education: { degree: 'B.S. Computer Engineering', school: 'Technion — Israel Institute of Technology', dates: '2014 — 2018' },
+    certifications: ['OSCP – Offensive Security Certified Professional', 'CISSP', 'AWS Certified Security – Specialty']
   },
 
   'mobile-developer': {
@@ -321,13 +327,47 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
     education: { degree: 'B.A. Economics', school: 'University of Texas at Austin', dates: '2012 — 2016' }
   },
 
-  'business-analyst': { ...DEFAULT_SE, fullName: 'Mei Lin', title: 'Senior Business Analyst',
-    summary: 'Business analyst bridging finance, ops and product teams. Built the planning model adopted across 12 BUs at a Fortune 500.',
-    skills:  'SQL · Tableau · Power BI · Looker · Excel modelling · Financial planning · Stakeholder management' },
+  'business-analyst': {
+    fullName: 'Mei Lin', title: 'Senior Business Analyst',
+    summary: 'Business analyst bridging finance, ops and product teams. Built the planning model adopted across 12 BUs at a Fortune 500; turned messy data into decisions leaders trust.',
+    skills:  'SQL · Tableau · Power BI · Looker · Excel modelling · Requirements gathering · Process mapping · Stakeholder management · Agile',
+    experience: [
+      { role: 'Senior Business Analyst', company: 'Unilever', dates: '2021 — Present',
+        bullets: [
+          'Built the demand-planning model now used across 12 business units; cut forecast error 19%.',
+          'Led requirements for a $6M ERP migration spanning 4 regions and 300+ users.',
+          'Automated 14 monthly reports in Power BI, saving the team 30 hours/month.'
+        ] },
+      { role: 'Business Analyst', company: 'HSBC', dates: '2018 — 2021',
+        bullets: [
+          'Mapped 40+ end-to-end processes during a core-banking modernisation.',
+          'Authored BRDs and user stories for an Agile team of 9.'
+        ] }
+    ],
+    education: { degree: 'B.Sc. Business Information Systems', school: 'University of Manchester', dates: '2014 — 2018' },
+    certifications: ['IIBA – CBAP (Certified Business Analysis Professional)', 'Certified Scrum Master (CSM)', 'Microsoft Power BI Data Analyst Associate']
+  },
 
-  'project-manager': { ...DEFAULT_SE, fullName: 'Rohit Sharma', title: 'Senior Project Manager',
-    summary: 'PMP-certified project manager delivering 28 enterprise programs on time and under budget. $80M cumulative TCV managed.',
-    skills:  'PMP · Agile · Scrum · Risk management · Stakeholder communication · Jira · Confluence · MS Project' },
+  'project-manager': {
+    fullName: 'Rohit Sharma', title: 'Senior Project Manager',
+    summary: 'PMP-certified project manager delivering 28 enterprise programs on time and under budget. $80M cumulative TCV managed across FinTech and telecom.',
+    skills:  'PMP · Agile · Scrum · Risk management · Budgeting · Stakeholder communication · Jira · Confluence · MS Project',
+    experience: [
+      { role: 'Senior Project Manager', company: 'Accenture', dates: '2020 — Present',
+        bullets: [
+          'Delivered a $24M digital-transformation program for a tier-1 bank, 6 weeks early.',
+          'Ran 5 concurrent Agile teams (45 people) with a 98% on-time sprint record.',
+          'Recovered a red-status program to green in 8 weeks via re-scoping and risk burndown.'
+        ] },
+      { role: 'Project Manager', company: 'Infosys', dates: '2016 — 2020',
+        bullets: [
+          'Managed 11 client projects totalling $32M with a 4.8/5 average CSAT.',
+          'Introduced a risk-register cadence that cut overruns 22%.'
+        ] }
+    ],
+    education: { degree: 'B.E. Information Technology', school: 'Delhi Technological University', dates: '2010 — 2014' },
+    certifications: ['PMI – Project Management Professional (PMP)', 'PMI Agile Certified Practitioner (PMI-ACP)', 'PRINCE2 Practitioner']
+  },
 
   'product-manager': {
     fullName: 'Aisha Bello', title: 'Senior Product Manager',
@@ -341,7 +381,8 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
           'Ran the discovery program that killed 6 false starts before they shipped.'
         ] }
     ],
-    education: { degree: 'M.B.A.', school: 'Stanford GSB', dates: '2019 — 2021' }
+    education: { degree: 'M.B.A.', school: 'Stanford GSB', dates: '2019 — 2021' },
+    certifications: ['Pragmatic Institute – Product Management Certified (PMC-III)', 'Certified Scrum Product Owner (CSPO)']
   },
 
   'consultant': { ...DEFAULT_SE,
@@ -355,16 +396,45 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
           'Built the operating-model blueprint adopted by a $4B telco post-merger.'
         ] }
     ],
-    education: { degree: 'M.B.A.', school: 'INSEAD', dates: '2017 — 2019' }
+    education: { degree: 'M.B.A.', school: 'INSEAD', dates: '2017 — 2019' },
+    certifications: ['Project Management Professional (PMP)', 'Lean Six Sigma Black Belt']
   },
 
   // ----- FINANCE / OPS -----
-  'finance':    { ...DEFAULT_SE, fullName: 'Olivia Brooks', title: 'Senior Finance Manager',
-    summary: 'FP&A lead covering revenue, opex and headcount planning. Built the planning model adopted board-wide; saved 40 hours/month of analyst time.',
-    skills:  'Financial modelling · FP&A · Forecasting · Variance analysis · Excel · NetSuite · Looker · SQL' },
-  'accountant': { ...DEFAULT_SE, fullName: 'David Chen',   title: 'Senior Accountant',
-    summary: 'CPA-qualified senior accountant with 9 years closing books at scale. Led 3 year-end audits with zero findings.',
-    skills:  'CPA · US GAAP · IFRS · NetSuite · QuickBooks · Audit · SOX · Revenue recognition (ASC 606)' },
+  'finance': {
+    fullName: 'Olivia Brooks', title: 'Senior Finance Manager',
+    summary: 'FP&A leader covering revenue, opex and headcount planning for a $400M business. Built the planning model adopted board-wide; saved 40 analyst-hours every month.',
+    skills:  'Financial modelling · FP&A · Forecasting · Budgeting · Variance analysis · Excel · NetSuite · Looker · SQL',
+    experience: [
+      { role: 'Senior Finance Manager', company: 'Spotify', dates: '2021 — Present',
+        bullets: [
+          'Own the $180M opex plan; brought forecast accuracy to within 2% for 6 quarters running.',
+          'Built the driver-based model now used in every board pack.',
+          'Led the finance workstream for a $90M acquisition through close and integration.'
+        ] },
+      { role: 'Finance Manager', company: 'Deloitte', dates: '2017 — 2021',
+        bullets: ['Advised 6 mid-market clients on FP&A transformation and systems selection.'] }
+    ],
+    education: { degree: 'B.Sc. Economics & Finance', school: 'London School of Economics', dates: '2013 — 2017' },
+    certifications: ['CFA Charterholder (Level III passed)', 'FMVA – Financial Modeling & Valuation Analyst']
+  },
+  'accountant': {
+    fullName: 'David Chen', title: 'Senior Accountant',
+    summary: 'CPA-qualified senior accountant with 9 years closing books at scale. Led 3 year-end audits with zero findings and cut the monthly close from 9 days to 4.',
+    skills:  'US GAAP · IFRS · NetSuite · QuickBooks · Month-end close · Audit · SOX · Revenue recognition (ASC 606) · Excel',
+    experience: [
+      { role: 'Senior Accountant', company: 'KPMG', dates: '2020 — Present',
+        bullets: [
+          'Manage the full-cycle close for a $250M revenue entity; cut close time 56%.',
+          'Led 3 clean year-end audits with zero material findings.',
+          'Implemented ASC 606 revenue automation across 4 product lines.'
+        ] },
+      { role: 'Staff Accountant', company: 'PwC', dates: '2016 — 2020',
+        bullets: ['Owned AP/AR and reconciliations across a 12-entity consolidation.'] }
+    ],
+    education: { degree: 'B.S. Accounting', school: 'University of Illinois Urbana-Champaign', dates: '2012 — 2016' },
+    certifications: ['Certified Public Accountant (CPA)', 'Certified Management Accountant (CMA)']
+  },
   'banking':    { ...DEFAULT_SE, fullName: 'Emma Thornton', title: 'Investment Banking Associate',
     summary: 'IB associate covering TMT M&A. Closed $2.4B in announced deals across 8 transactions in 18 months.',
     skills:  'M&A · LBO modelling · DCF · Comparable company analysis · Pitch books · Bloomberg · CapIQ',
@@ -375,32 +445,135 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
           'Built the LBO model anchoring the $640M take-private of a public SaaS target.'
         ] }
     ],
-    education: { degree: 'M.B.A.', school: 'Wharton', dates: '2019 — 2021' } },
-  'operations': { ...DEFAULT_SE, fullName: 'Hassan Raza',   title: 'Senior Operations Manager',
-    summary: 'Ops leader scaling support, success and ops teams 5→90 across two B2B SaaS companies.',
-    skills:  'Operations · Process design · CSAT · NPS · Workforce planning · Zendesk · Salesforce · SQL' },
-  'customer-support': { ...DEFAULT_SE, fullName: 'Lucia Romano', title: 'Customer Support Lead',
-    summary: 'CX leader building support teams that scale with the product. Lifted CSAT from 82 → 96 while volume grew 3.4×.',
-    skills:  'CX strategy · CSAT/NPS · Zendesk · Intercom · Quality assurance · Workforce planning' },
+    education: { degree: 'M.B.A.', school: 'Wharton', dates: '2019 — 2021' },
+    certifications: ['CFA Charterholder', 'Series 79 & Series 63 (FINRA)'] },
+  'operations': {
+    fullName: 'Hassan Raza', title: 'Senior Operations Manager',
+    summary: 'Operations leader who scaled support, success and ops teams from 5 → 90 across two B2B SaaS companies while improving margins.',
+    skills:  'Operations · Process design · Lean Six Sigma · Vendor management · CSAT · NPS · Workforce planning · Zendesk · Salesforce · SQL',
+    experience: [
+      { role: 'Senior Operations Manager', company: 'Careem (Uber)', dates: '2021 — Present',
+        bullets: [
+          'Scaled the ops org from 18 → 90 across 3 markets while cutting cost-per-ticket 28%.',
+          'Redesigned the fulfilment workflow, lifting on-time delivery from 86% → 97%.',
+          'Stood up the vendor-management function governing $12M annual spend.'
+        ] },
+      { role: 'Operations Lead', company: 'Daraz', dates: '2018 — 2021',
+        bullets: ['Built the SOP library and QA program adopted company-wide.'] }
+    ],
+    education: { degree: 'B.B.A. Operations Management', school: 'LUMS', dates: '2014 — 2018' },
+    certifications: ['Lean Six Sigma Green Belt', 'APICS CPIM (Certified in Planning & Inventory Management)']
+  },
+  'customer-support': {
+    fullName: 'Lucia Romano', title: 'Customer Support Lead',
+    summary: 'CX leader building support teams that scale with the product. Lifted CSAT from 82 → 96 while ticket volume grew 3.4× — without growing headcount linearly.',
+    skills:  'CX strategy · CSAT / NPS · Zendesk · Intercom · Knowledge base · Quality assurance · Workforce planning · Coaching',
+    experience: [
+      { role: 'Customer Support Lead', company: 'Revolut', dates: '2021 — Present',
+        bullets: [
+          'Lifted CSAT from 82 → 96 and cut first-response time from 6h → 22min.',
+          'Built the macros + self-serve KB that deflected 38% of inbound tickets.',
+          'Hired and coached a 14-person team across 3 time zones.'
+        ] },
+      { role: 'Senior Support Specialist', company: 'Booking.com', dates: '2018 — 2021',
+        bullets: ['Top-rated agent 7 quarters running; mentored 5 new hires.'] }
+    ],
+    education: { degree: 'B.A. Communications', school: 'Università Bocconi', dates: '2014 — 2018' }
+  },
 
   // ----- PEOPLE / EDU -----
-  'hr':        { ...DEFAULT_SE, fullName: 'Maria Costa',   title: 'Senior HR Business Partner',
-    summary: 'HRBP partnering with eng + product leadership. Led 3 reorgs spanning 800 employees with zero unplanned attrition.',
-    skills:  'People strategy · Comp design · Performance management · Workday · Coaching · Change management' },
-  'recruiter': { ...DEFAULT_SE, fullName: 'Daniel Park',   title: 'Senior Technical Recruiter',
-    summary: 'Tech recruiter who has placed 220+ engineers and PMs across FAANG and Series B startups.',
-    skills:  'Sourcing · Closing · Greenhouse · Gem · LinkedIn Recruiter · Comp negotiation · DEI hiring' },
+  'hr': {
+    fullName: 'Maria Costa', title: 'Senior HR Business Partner',
+    summary: 'HRBP partnering with engineering and product leadership at scale. Led 3 reorgs spanning 800 employees with zero unplanned attrition.',
+    skills:  'People strategy · Compensation design · Performance management · Employee relations · Workday · Coaching · Change management · DEI',
+    experience: [
+      { role: 'Senior HR Business Partner', company: 'SAP', dates: '2021 — Present',
+        bullets: [
+          'Partner to 5 VPs across an 800-person org; held regretted attrition under 4%.',
+          'Designed the levelling + comp framework now used company-wide in EMEA.',
+          'Led 3 reorgs and 2 post-acquisition integrations end-to-end.'
+        ] },
+      { role: 'HR Manager', company: 'Zalando', dates: '2017 — 2021',
+        bullets: ['Ran performance and engagement programs for a 300-person business unit.'] }
+    ],
+    education: { degree: 'M.Sc. Human Resource Management', school: 'Universidade NOVA de Lisboa', dates: '2013 — 2015' },
+    certifications: ['SHRM Senior Certified Professional (SHRM-SCP)', 'CIPD Level 7 (Chartered Member)']
+  },
+  'recruiter': {
+    fullName: 'Daniel Park', title: 'Senior Technical Recruiter',
+    summary: 'Technical recruiter who has placed 220+ engineers and PMs across FAANG and Series B startups, with a 92% offer-accept rate.',
+    skills:  'Full-cycle recruiting · Sourcing · Closing · Greenhouse · Gem · LinkedIn Recruiter · Comp negotiation · DEI hiring · Boolean search',
+    experience: [
+      { role: 'Senior Technical Recruiter', company: 'Datadog', dates: '2021 — Present',
+        bullets: [
+          'Closed 84 engineering hires in 24 months with a 92% offer-accept rate.',
+          'Cut average time-to-fill from 51 → 34 days via a revamped sourcing funnel.',
+          'Built the structured-interview rubric adopted across all eng hiring.'
+        ] },
+      { role: 'Technical Recruiter', company: 'Stripe', dates: '2018 — 2021',
+        bullets: ['Filled 60+ roles across infra, payments and data teams.'] }
+    ],
+    education: { degree: 'B.A. Psychology', school: 'University of British Columbia', dates: '2013 — 2017' },
+    certifications: ['LinkedIn Certified Professional – Recruiter', 'AIRS Certified Diversity Recruiter (CDR)']
+  },
 
-  'teacher':   { ...DEFAULT_SE, fullName: 'Sarah Mitchell', title: 'Secondary Mathematics Teacher',
-    summary: 'Mathematics teacher with 11 years across state and grammar schools. GCSE pass rate consistently 28+ points above national average.',
-    skills:  'Curriculum design · Pedagogy · Differentiation · AfL · IGCSE · A-level Further Maths · Pastoral care' },
-  'professor': { ...DEFAULT_SE, fullName: 'Dr. Ada Nwosu',  title: 'Assistant Professor of Computer Science',
-    summary: 'Tenure-track CS professor. 14 peer-reviewed publications, 1,800+ citations, NSF CAREER award 2023.',
-    skills:  'Research · Teaching · Grant writing · LaTeX · Curriculum design · Peer review · Student advising' },
+  'teacher': {
+    fullName: 'Sarah Mitchell', title: 'Secondary Mathematics Teacher',
+    summary: 'Mathematics teacher with 11 years across state and grammar schools. GCSE pass rate consistently 28+ points above the national average.',
+    skills:  'Curriculum design · Pedagogy · Differentiation · Assessment for Learning · IGCSE · A-level Further Maths · Pastoral care · EdTech',
+    experience: [
+      { role: 'Head of Mathematics', company: 'King Edward’s School', dates: '2018 — Present',
+        bullets: [
+          'Lead a department of 9; raised A*–A grades from 41% → 68% in three years.',
+          'Designed the KS3–KS5 scheme of work now used across the trust.',
+          'Mentor 4 trainee teachers each year through their NQT/ECT period.'
+        ] },
+      { role: 'Mathematics Teacher', company: 'Highfield Academy', dates: '2013 — 2018',
+        bullets: ['Ran intervention groups that moved 30+ students up a full grade band.'] }
+    ],
+    education: { degree: 'PGCE Secondary Mathematics', school: 'University of Cambridge', dates: '2012 — 2013' },
+    certifications: ['Qualified Teacher Status (QTS)', 'National Professional Qualification for Middle Leadership (NPQML)']
+  },
+  'professor': {
+    fullName: 'Dr. Ada Nwosu', title: 'Assistant Professor of Computer Science',
+    summary: 'Tenure-track CS professor with 14 peer-reviewed publications, 1,800+ citations, and an NSF CAREER award (2023).',
+    skills:  'Research · Teaching · Grant writing · LaTeX · Curriculum design · Peer review · Student advising · Machine learning',
+    experience: [
+      { role: 'Assistant Professor', company: 'University of Toronto', dates: '2020 — Present',
+        bullets: [
+          'Secured $1.6M in competitive funding incl. an NSF CAREER award.',
+          'Advise 6 PhD and 4 MSc students; 3 alumni now in tenure-track posts.',
+          'Published 11 papers at NeurIPS, ICML and ICLR since appointment.'
+        ] },
+      { role: 'Postdoctoral Researcher', company: 'MIT CSAIL', dates: '2017 — 2020',
+        bullets: ['Led the lab’s time-series representation-learning research thread.'] }
+    ],
+    education: { degree: 'Ph.D. Computer Science', school: 'University of Oxford', dates: '2013 — 2017' },
+    certifications: ['Fellow of the Higher Education Academy (FHEA)']
+  },
   'academic':  { ...DEFAULT_SE, fullName: 'Dr. Ada Nwosu',  title: 'Research Fellow',
     summary: 'Research focus on representation learning for time-series. NeurIPS, ICML and ICLR publications; H-index 14.',
-    skills:  'PyTorch · JAX · Statistical inference · Causal modelling · LaTeX · Grant writing · Peer review' },
-  'research':  { ...DEFAULT_SE, fullName: 'Dr. Ada Nwosu',  title: 'Research Scientist' },
+    skills:  'PyTorch · JAX · Statistical inference · Causal modelling · LaTeX · Grant writing · Peer review',
+    experience: [
+      { role: 'Research Fellow', company: 'Alan Turing Institute', dates: '2020 — Present',
+        bullets: [
+          'Lead a 4-person research group on self-supervised time-series models.',
+          'First-author on 7 papers; 1,800+ total citations, H-index 14.'
+        ] }
+    ],
+    education: { degree: 'Ph.D. Machine Learning', school: 'University of Oxford', dates: '2013 — 2017' },
+    certifications: ['Fellow of the Higher Education Academy (FHEA)'] },
+  'research':  { ...DEFAULT_SE, fullName: 'Dr. Ada Nwosu',  title: 'Research Scientist',
+    summary: 'Research scientist bridging academia and industry. Translates state-of-the-art ML into production systems at scale.',
+    skills:  'PyTorch · JAX · Experimental design · Statistical inference · Causal modelling · Publishing · Mentoring',
+    experience: [
+      { role: 'Research Scientist', company: 'DeepMind', dates: '2020 — Present',
+        bullets: [
+          'Lead author on 5 publications; one cited 600+ times.',
+          'Shipped a forecasting model into a product serving 30M users.'
+        ] }
+    ],
+    education: { degree: 'Ph.D. Machine Learning', school: 'University of Oxford', dates: '2013 — 2017' } },
 
   // ----- HEALTHCARE / LEGAL -----
   'doctor': {
@@ -415,14 +588,43 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
           'Designed the rapid-response protocol that cut code-blue events 31%.'
         ] }
     ],
-    education: { degree: 'M.D.', school: 'Harvard Medical School', dates: '2011 — 2015' }
+    education: { degree: 'M.D.', school: 'Harvard Medical School', dates: '2011 — 2015' },
+    certifications: ['Board Certified – Internal Medicine (ABIM)', 'Advanced Cardiac Life Support (ACLS)', 'USMLE Step 1–3']
   },
-  'nurse': { ...DEFAULT_SE, fullName: 'Grace Adeyemi', title: 'Registered Nurse (ICU)',
-    summary: 'BSN-RN with 8 years critical-care experience. Charge-nurse-eligible. CCRN-certified. Bilingual English/French.',
-    skills:  'Critical care · Triage · IV therapy · BLS · ACLS · CCRN · Epic · Patient advocacy · Mentoring' },
-  'pharmacist':{ ...DEFAULT_SE, fullName: 'Karim El-Sayed', title: 'Clinical Pharmacist',
-    summary: 'PharmD specialising in oncology. 7 years across hospital and ambulatory settings. Board-certified BCOP.',
-    skills:  'Oncology pharmacy · BCOP · Chemotherapy verification · Patient counselling · Drug interactions · MTM' },
+  'nurse': {
+    fullName: 'Grace Adeyemi', title: 'Registered Nurse (ICU)',
+    summary: 'BSN-RN with 8 years of critical-care experience and a spotless safety record. Charge-nurse-eligible, CCRN-certified, bilingual English/French.',
+    skills:  'Critical care · Triage · IV therapy · Ventilator management · Patient advocacy · Epic · Care planning · Mentoring',
+    experience: [
+      { role: 'ICU Registered Nurse', company: 'Toronto General Hospital', dates: '2019 — Present',
+        bullets: [
+          'Manage a 1:2 acuity ICU caseload; zero medication errors in 5 years.',
+          'Precept 6+ new graduate nurses per year through unit orientation.',
+          'Member of the rapid-response team and unit-based practice council.'
+        ] },
+      { role: 'Medical-Surgical Nurse', company: 'Mount Sinai Hospital', dates: '2016 — 2019',
+        bullets: ['Cared for post-op patients across a 34-bed surgical unit.'] }
+    ],
+    education: { degree: 'B.Sc. Nursing (BSN)', school: 'University of Toronto', dates: '2012 — 2016' },
+    certifications: ['Critical Care RN (CCRN)', 'Advanced Cardiac Life Support (ACLS)', 'Basic Life Support (BLS)']
+  },
+  'pharmacist': {
+    fullName: 'Karim El-Sayed', title: 'Clinical Pharmacist',
+    summary: 'PharmD specialising in oncology with 7 years across hospital and ambulatory settings. Board-certified BCOP; reduced adverse drug events 26% on the unit.',
+    skills:  'Oncology pharmacy · Chemotherapy verification · Medication therapy management · Patient counselling · Drug interactions · Sterile compounding',
+    experience: [
+      { role: 'Clinical Pharmacist — Oncology', company: 'Cleveland Clinic', dates: '2020 — Present',
+        bullets: [
+          'Verify and optimise chemotherapy regimens for 40+ patients daily.',
+          'Cut adverse drug events 26% via a pharmacist-led review protocol.',
+          'Precept PharmD students and PGY-1 residents on the oncology rotation.'
+        ] },
+      { role: 'Staff Pharmacist', company: 'CVS Health', dates: '2017 — 2020',
+        bullets: ['Ran the MTM program; completed 1,200+ comprehensive medication reviews.'] }
+    ],
+    education: { degree: 'Doctor of Pharmacy (PharmD)', school: 'University of Michigan', dates: '2013 — 2017' },
+    certifications: ['Board Certified Oncology Pharmacist (BCOP)', 'Board Certified Pharmacotherapy Specialist (BCPS)']
+  },
   'lawyer': { ...DEFAULT_SE, fullName: 'Patricia Wells', title: 'Senior Corporate Attorney',
     summary: 'Corporate lawyer with 11 years on cross-border M&A. Closed $3.2B in announced deals across 14 transactions.',
     skills:  'M&A · Securities · Contract negotiation · Cross-border deals · Due diligence · Corporate governance',
@@ -433,24 +635,95 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
           'Drafted the joint-venture framework adopted by a $40B FTSE 100 client.'
         ] }
     ],
-    education: { degree: 'J.D.', school: 'Columbia Law School', dates: '2012 — 2015' } },
+    education: { degree: 'J.D.', school: 'Columbia Law School', dates: '2012 — 2015' },
+    certifications: ['Admitted to the New York State Bar', 'Solicitor of England & Wales (non-practising)'] },
 
   // ----- BUILT ENVIRONMENT -----
-  'architect': { ...DEFAULT_SE, fullName: 'Andreas Meier', title: 'Senior Architect',
-    summary: 'Licensed architect with 12 years across residential, commercial and adaptive-reuse. AIA award winner 2022.',
-    skills:  'AutoCAD · Revit · Rhino · SketchUp · BIM · Sustainability (LEED AP) · Construction documents · Client management' },
-  'civil-engineer':      { ...DEFAULT_SE, fullName: 'Faisal Ahmed',  title: 'Civil Engineer (P.E.)',
-    summary: 'Licensed civil engineer with 10 years on transportation and bridge infrastructure. Lead design on 3 projects exceeding $80M.',
-    skills:  'Structural analysis · AutoCAD Civil 3D · STAAD.Pro · MicroStation · Project management · DOT specifications' },
-  'mechanical-engineer': { ...DEFAULT_SE, fullName: 'Sven Larsson',  title: 'Senior Mechanical Engineer',
-    summary: 'Mechanical engineer specialising in HVAC and energy systems. Designed systems saving clients €2.8M/yr in energy costs.',
-    skills:  'SolidWorks · AutoCAD · Thermodynamics · FEA · Energy modelling · HVAC · CFD · LEED' },
-  'electrical-engineer': { ...DEFAULT_SE, fullName: 'Wei Chen',      title: 'Senior Electrical Engineer',
-    summary: 'Power systems engineer with 9 years on grid integration and renewable projects. Lead engineer on a 120MW solar farm interconnection.',
-    skills:  'Power systems · ETAP · MATLAB · PSCAD · Protection design · Renewable integration · NEC' },
-  'real-estate': { ...DEFAULT_SE, fullName: 'Natalie Greene', title: 'Senior Real Estate Agent',
-    summary: 'Top-producing agent with 8 years in luxury residential. Closed $84M in 2024 — #3 in the brokerage.',
-    skills:  'Luxury residential · Negotiation · CRM · Marketing · Staging · Investor relations · Off-market sourcing' },
+  'architect': {
+    fullName: 'Andreas Meier', title: 'Senior Architect',
+    summary: 'Licensed architect with 12 years across residential, commercial and adaptive-reuse. AIA Design Award winner (2022); LEED AP with a sustainability focus.',
+    skills:  'AutoCAD · Revit · Rhino · SketchUp · BIM · Sustainability (LEED AP) · Construction documents · Client management',
+    experience: [
+      { role: 'Senior Architect', company: 'Foster + Partners', dates: '2019 — Present',
+        bullets: [
+          'Lead architect on a €120M mixed-use development from concept to handover.',
+          'Won the 2022 AIA Design Award for an adaptive-reuse cultural centre.',
+          'Run a 6-person studio team and coordinate 12-discipline consultant packages.'
+        ] },
+      { role: 'Project Architect', company: 'Gensler', dates: '2014 — 2019',
+        bullets: ['Delivered 8 commercial fit-outs totalling 400,000 sq ft.'] }
+    ],
+    education: { degree: 'M.Arch.', school: 'ETH Zürich', dates: '2010 — 2013' },
+    certifications: ['Licensed Architect (ARB / RIBA)', 'LEED Accredited Professional (LEED AP BD+C)']
+  },
+  'civil-engineer': {
+    fullName: 'Faisal Ahmed', title: 'Civil Engineer (P.E.)',
+    summary: 'Licensed civil engineer with 10 years on transportation and bridge infrastructure. Lead design on 3 projects each exceeding $80M.',
+    skills:  'Structural analysis · AutoCAD Civil 3D · STAAD.Pro · MicroStation · Project management · DOT specifications · AASHTO',
+    experience: [
+      { role: 'Senior Civil Engineer', company: 'AECOM', dates: '2019 — Present',
+        bullets: [
+          'Lead design engineer on an $82M highway interchange delivered on schedule.',
+          'Stamped construction documents for 14 bridge and roadway projects.',
+          'Mentor 4 EITs toward their P.E. licensure.'
+        ] },
+      { role: 'Civil Engineer', company: 'Jacobs', dates: '2014 — 2019',
+        bullets: ['Performed structural analysis and design for 20+ DOT projects.'] }
+    ],
+    education: { degree: 'B.Sc. Civil Engineering', school: 'NUST', dates: '2010 — 2014' },
+    certifications: ['Professional Engineer (P.E.)', 'Engineer-in-Training (EIT)', 'OSHA 30-Hour Construction']
+  },
+  'mechanical-engineer': {
+    fullName: 'Sven Larsson', title: 'Senior Mechanical Engineer',
+    summary: 'Mechanical engineer specialising in HVAC and energy systems. Designed systems saving clients €2.8M/yr in energy costs across commercial portfolios.',
+    skills:  'SolidWorks · AutoCAD · Thermodynamics · FEA · Energy modelling · HVAC · CFD · LEED · GD&T',
+    experience: [
+      { role: 'Senior Mechanical Engineer', company: 'Arup', dates: '2019 — Present',
+        bullets: [
+          'Designed HVAC + energy systems for a 1.2M sq ft campus; cut energy use 31%.',
+          'Ran CFD and FEA studies that resolved 9 critical design risks pre-construction.',
+          'Led the MEP coordination for a €60M data-centre build.'
+        ] },
+      { role: 'Mechanical Engineer', company: 'Siemens', dates: '2015 — 2019',
+        bullets: ['Developed thermal models for industrial drive systems.'] }
+    ],
+    education: { degree: 'M.Sc. Mechanical Engineering', school: 'KTH Royal Institute of Technology', dates: '2011 — 2013' },
+    certifications: ['Professional Engineer (P.E.)', 'LEED Accredited Professional', 'Certified Energy Manager (CEM)']
+  },
+  'electrical-engineer': {
+    fullName: 'Wei Chen', title: 'Senior Electrical Engineer',
+    summary: 'Power-systems engineer with 9 years on grid integration and renewable projects. Lead engineer on a 120MW solar-farm interconnection.',
+    skills:  'Power systems · ETAP · MATLAB · PSCAD · Protection & control · Renewable integration · NEC · IEC 61850',
+    experience: [
+      { role: 'Senior Electrical Engineer', company: 'GE Vernova', dates: '2019 — Present',
+        bullets: [
+          'Lead engineer on a 120MW solar-farm grid interconnection, delivered under budget.',
+          'Performed protection coordination and load-flow studies for 15 substations.',
+          'Cut commissioning rework 40% via a standardised relay-settings template.'
+        ] },
+      { role: 'Electrical Engineer', company: 'ABB', dates: '2015 — 2019',
+        bullets: ['Designed MV/LV distribution for industrial and utility clients.'] }
+    ],
+    education: { degree: 'B.Eng. Electrical Engineering', school: 'Tsinghua University', dates: '2011 — 2015' },
+    certifications: ['Professional Engineer (P.E.)', 'IEEE Senior Member']
+  },
+  'real-estate': {
+    fullName: 'Natalie Greene', title: 'Senior Real Estate Agent',
+    summary: 'Top-producing agent with 8 years in luxury residential. Closed $84M in 2024 — #3 in the brokerage — with a referral-driven pipeline.',
+    skills:  'Luxury residential · Negotiation · CRM · Listing marketing · Staging · Investor relations · Off-market sourcing · Comparative market analysis',
+    experience: [
+      { role: 'Senior Real Estate Agent', company: 'Sotheby’s International Realty', dates: '2019 — Present',
+        bullets: [
+          'Closed $84M in volume in 2024 — ranked #3 of 140 agents in the office.',
+          'Maintain a 98% list-to-sale price ratio with average 21 days on market.',
+          'Built a 600-contact referral network generating 70% of new business.'
+        ] },
+      { role: 'Real Estate Agent', company: 'Compass', dates: '2016 — 2019',
+        bullets: ['Grew from new agent to $20M annual volume in three years.'] }
+    ],
+    education: { degree: 'B.A. Marketing', school: 'University of Southern California', dates: '2012 — 2016' },
+    certifications: ['Licensed Real Estate Salesperson', 'Certified Luxury Home Marketing Specialist (CLHMS)']
+  },
 
   // ----- CAREER STAGE -----
   'fresh-graduate': {
@@ -466,7 +739,8 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
       { role: 'Software Engineering Intern', company: 'Stripe', dates: 'Summer 2023',
         bullets: ['Shipped 3 features on the Billing Portal used by 80K+ merchants.'] }
     ],
-    education: { degree: 'B.S. Computer Science', school: 'Carnegie Mellon University', dates: '2021 — 2025', detail: 'GPA 3.92 · Dean’s List all 4 years' }
+    education: { degree: 'B.S. Computer Science', school: 'Carnegie Mellon University', dates: '2021 — 2025', detail: 'GPA 3.92 · Dean’s List all 4 years' },
+    certifications: ['AWS Certified Cloud Practitioner', 'Meta Front-End Developer Professional Certificate']
   },
   'internship': { ...DEFAULT_SE,
     fullName: 'Jamie Carter', title: 'Software Engineering Intern',
@@ -491,17 +765,70 @@ export const SAMPLE_RESUMES: Record<string, SampleResume> = {
     ],
     education: { degree: 'M.B.A.', school: 'Harvard Business School', dates: '2003 — 2005' } },
 
-  'government':  { ...DEFAULT_SE, fullName: 'John Anderson', title: 'Senior Policy Analyst',
-    summary: 'Policy analyst with 9 years across federal and state policy. Author of 3 white papers cited in Senate hearings.',
-    skills:  'Policy analysis · Quantitative research · Stakeholder engagement · Stata · R · Federal regulation · Briefing' },
-  'freelancer':  { ...DEFAULT_SE, fullName: 'Eva Sokolova',  title: 'Freelance Full-Stack Developer',
+  'government': {
+    fullName: 'John Anderson', title: 'Senior Policy Analyst',
+    summary: 'Policy analyst with 9 years across federal and state government. Author of 3 white papers cited in Senate hearings; turns evidence into legislation that ships.',
+    skills:  'Policy analysis · Quantitative research · Legislative process · Stakeholder engagement · Stata · R · Federal regulation · Briefing',
+    experience: [
+      { role: 'Senior Policy Analyst', company: 'U.S. Department of the Treasury', dates: '2020 — Present',
+        bullets: [
+          'Authored 3 policy white papers cited in Senate Finance Committee hearings.',
+          'Led the economic-impact analysis behind a $2B grant program.',
+          'Brief the Deputy Secretary’s office on a biweekly cadence.'
+        ] },
+      { role: 'Policy Analyst', company: 'State of California — Legislative Analyst’s Office', dates: '2016 — 2020',
+        bullets: ['Produced 40+ fiscal analyses supporting budget deliberations.'] }
+    ],
+    education: { degree: 'M.P.P. Public Policy', school: 'Harvard Kennedy School', dates: '2014 — 2016' },
+    certifications: ['Certified Government Financial Manager (CGFM)']
+  },
+  'freelancer': {
+    fullName: 'Eva Sokolova', title: 'Freelance Full-Stack Developer',
     summary: 'Full-stack freelancer with 7 years shipping client work for 24 companies (Series A → public). 100% 5-star rating across 60+ projects.',
-    skills:  'TypeScript · React · Next.js · Node · PostgreSQL · AWS · Stripe · Client management · Contracts' },
-  'hospitality': { ...DEFAULT_SE, fullName: 'Antonio Bianchi', title: 'Senior Hotel Operations Manager',
-    summary: 'Hospitality leader running 220-room luxury properties. Lifted ADR 14% and RevPAR 22% YoY across two flagship hotels.',
-    skills:  'Operations · F&B · Revenue management · Opera PMS · Guest experience · Team leadership · P&L ownership' }
+    skills:  'TypeScript · React · Next.js · Node · PostgreSQL · AWS · Stripe · Client management · Scoping · Contracts',
+    experience: [
+      { role: 'Independent Full-Stack Developer', company: 'Self-employed', dates: '2019 — Present',
+        bullets: [
+          'Delivered 60+ projects for 24 clients with a 100% 5-star rating.',
+          'Built a SaaS MVP from zero to 10K paying users for a seed-stage founder.',
+          'Retain 8 long-term clients on monthly contracts; 70% of revenue is repeat.'
+        ] },
+      { role: 'Senior Frontend Developer', company: 'Toptal (network)', dates: '2017 — 2019',
+        bullets: ['Top-3% accepted talent; placed on 12 enterprise engagements.'] }
+    ],
+    education: { degree: 'B.Sc. Computer Science', school: 'Charles University, Prague', dates: '2012 — 2016' }
+  },
+  'hospitality': {
+    fullName: 'Antonio Bianchi', title: 'Senior Hotel Operations Manager',
+    summary: 'Hospitality leader running 220-room luxury properties. Lifted ADR 14% and RevPAR 22% YoY across two flagship hotels while raising guest-sat scores.',
+    skills:  'Operations · F&B · Revenue management · Opera PMS · Guest experience · Team leadership · P&L ownership · Forecasting',
+    experience: [
+      { role: 'Hotel Operations Manager', company: 'Four Seasons Hotels & Resorts', dates: '2020 — Present',
+        bullets: [
+          'Run daily operations for a 220-room flagship; lifted RevPAR 22% YoY.',
+          'Raised guest-satisfaction (LQA) scores from 88% → 95% in two years.',
+          'Lead a 120-person cross-departmental team across rooms and F&B.'
+        ] },
+      { role: 'Front Office Manager', company: 'Marriott International', dates: '2016 — 2020',
+        bullets: ['Managed a 30-person front-office team across two properties.'] }
+    ],
+    education: { degree: 'B.A. Hospitality Management', school: 'Les Roches (Switzerland)', dates: '2012 — 2016' },
+    certifications: ['Certified Hotel Administrator (CHA)', 'ServSafe Manager Certification']
+  }
 };
 
 export function sampleFor(category: string): SampleResume {
   return SAMPLE_RESUMES[category] ?? DEFAULT_SE;
+}
+
+/** Split a "·"/","-separated skills string into individual skill names. */
+export function splitSkills(skills: string, max = 8): string[] {
+  return skills.split(/[·,•|]/).map(s => s.trim()).filter(Boolean).slice(0, max);
+}
+
+/** Deterministic proficiency levels (%) for skill bars — descending so the
+ *  first listed skills read as strongest. */
+const SKILL_LEVELS = [95, 90, 88, 84, 80, 76, 72, 68];
+export function skillBarsFrom(skills: string, max = 6): { name: string; level: number }[] {
+  return splitSkills(skills, max).map((name, i) => ({ name, level: SKILL_LEVELS[i] ?? 70 }));
 }

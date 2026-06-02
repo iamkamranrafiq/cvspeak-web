@@ -1,17 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
-import { sampleFor, SampleResume } from '@features/templates/data/sample-resumes';
+import { sampleFor, SampleResume, skillBarsFrom, splitSkills } from '@features/templates/data/sample-resumes';
 import { COUNTRY_BY_CODE, locationForCountry } from '@features/templates/data/countries';
 import { TemplateSummary } from '@core/models/api.models';
 
 /**
- * Renders a live, themed sample-resume preview for a TemplateDef.
- * Used as a thumbnail (thumb=true) inside template cards on the list page,
- * and at full scale on the detail page.
+ * Premium, live, themed resume preview.
  *
- * Theme is derived from the template's country. Color palette and typography
- * come from the template definition itself, so two templates from the same
- * country can still look distinct.
+ * Renders one of four layout archetypes (derived from the template's
+ * layoutType): a Sidebar-Pro (photo + skill bars + languages), a Two-Tone
+ * Header band, a Timeline, or an Elegant editorial layout.
+ *
+ * All colour comes from the template's palette via CSS custom properties,
+ * so every template looks distinct without per-template CSS. Typography
+ * (serif vs sans heading) is auto-detected from the template's heading font.
+ *
+ * Used as a thumbnail (thumb=true) inside cards, and full-size on the
+ * detail page and resume builder (thumb=false). When `data` is supplied the
+ * preview renders real user content instead of the sample candidate.
  */
 @Component({
   selector: 'app-template-preview',
@@ -19,287 +25,399 @@ import { TemplateSummary } from '@core/models/api.models';
   imports: [CommonModule],
   template: `
     <div class="tp"
-         [class]="'tp--theme-' + theme()"
+         [class]="'tp--arch-' + archetype()"
          [class.tp--thumb]="thumb()"
-         [style.--tp-primary]="def().palette?.primary"
-         [style.--tp-accent]="def().palette?.accent"
-         [style.--tp-surface]="def().palette?.surface"
-         [style.--tp-ink]="def().palette?.ink"
-         [style.--tp-font-h]="def().typography?.heading"
-         [style.--tp-font-b]="def().typography?.body">
+         [class.tp--serif]="serifHead()"
+         [class.tp--side-right]="sideRight()"
+         [style.--tp-primary]="def().palette?.primary || '#1e1b4b'"
+         [style.--tp-accent]="def().palette?.accent || '#7c3aed'"
+         [style.--tp-surface]="def().palette?.surface || '#ffffff'"
+         [style.--tp-ink]="def().palette?.ink || '#0f172a'">
 
-      <div class="tp__page" [class.tp__page--editorial]="def().layoutType === 'editorial'"
-                            [class.tp__page--sidebar-left]="def().layoutType === 'sidebar-left'"
-                            [class.tp__page--sidebar-right]="def().layoutType === 'sidebar-right'"
-                            [class.tp__page--two-column]="def().layoutType === 'two-column'"
-                            [class.tp__page--compact]="def().layoutType === 'compact'"
-                            [class.tp__page--header-block]="def().layoutType === 'header-block'">
+      <!-- =========================================================== -->
+      <!-- SIDEBAR PRO                                                  -->
+      <!-- =========================================================== -->
+      <ng-container *ngIf="archetype() === 'sidebar'">
+        <div class="grid-side">
+          <aside class="side">
+            <div class="side__avatar">{{ initials() }}</div>
+            <p class="side__name">{{ s().fullName }}</p>
+            <p class="side__role">{{ s().title }}</p>
 
-        <!-- Sidebar (when layout asks for it) -->
-        <aside class="tp__side" *ngIf="def().layoutType === 'sidebar-left' || def().layoutType === 'sidebar-right'">
-          <div class="tp__avatar">{{ initials() }}</div>
-          <h3>Contact</h3>
-          <p class="tp__small">{{ email() }}</p>
-          <p class="tp__small">{{ phone() }}</p>
-          <p class="tp__small">{{ location() }}</p>
-          <h3>Skills</h3>
-          <ul class="tp__chips">
-            <li *ngFor="let s of skillList()">{{ s }}</li>
-          </ul>
-        </aside>
+            <div class="side__block">
+              <h4>Contact</h4>
+              <p class="side__row"><span class="ic">✉</span>{{ email() }}</p>
+              <p class="side__row"><span class="ic">☎</span>{{ phone() }}</p>
+              <p class="side__row"><span class="ic">⚲</span>{{ location() }}</p>
+              <p class="side__row"><span class="ic">in</span>{{ linkedin() }}</p>
+            </div>
 
-        <main class="tp__main">
-          <header class="tp__head">
-            <h1>{{ sample().fullName }}</h1>
-            <p class="tp__title">{{ sample().title }}</p>
-            <p class="tp__contact" *ngIf="!isSidebar()">
-              {{ email() }} · {{ phone() }} · {{ location() }}
+            <div class="side__block">
+              <h4>Skills</h4>
+              <div class="skillbar" *ngFor="let sk of skillBars()">
+                <span class="skillbar__name">{{ sk.name }}</span>
+                <span class="skillbar__track"><span class="skillbar__fill" [style.width.%]="sk.level"></span></span>
+              </div>
+            </div>
+
+            <div class="side__block">
+              <h4>Languages</h4>
+              <div class="lang" *ngFor="let l of languages()">
+                <span class="lang__name">{{ l.name }}</span>
+                <span class="lang__dots">
+                  <i *ngFor="let d of dots; let i = index" [class.on]="i < l.level"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="side__block" *ngIf="s().certifications?.length">
+              <h4>Certifications</h4>
+              <p class="side__cert" *ngFor="let c of s().certifications">{{ c }}</p>
+            </div>
+          </aside>
+
+          <main class="main">
+            <section class="block">
+              <h2>{{ summaryLabel() }}</h2>
+              <p class="lede">{{ s().summary }}</p>
+            </section>
+            <section class="block">
+              <h2>Experience</h2>
+              <div class="tl">
+                <div class="tl__item" *ngFor="let e of s().experience">
+                  <div class="tl__head">
+                    <strong>{{ e.role }}</strong>
+                    <span class="muted">{{ e.dates }}</span>
+                  </div>
+                  <div class="tl__sub">{{ e.company }}</div>
+                  <ul><li *ngFor="let b of e.bullets">{{ b }}</li></ul>
+                </div>
+              </div>
+            </section>
+            <section class="block">
+              <h2>Education</h2>
+              <div class="tl__head"><strong>{{ s().education.degree }}</strong><span class="muted">{{ s().education.dates }}</span></div>
+              <div class="tl__sub">{{ s().education.school }}</div>
+            </section>
+          </main>
+        </div>
+      </ng-container>
+
+      <!-- =========================================================== -->
+      <!-- TWO-TONE HEADER BAND                                         -->
+      <!-- =========================================================== -->
+      <ng-container *ngIf="archetype() === 'header'">
+        <div class="hdr">
+          <header class="hdr__band">
+            <h1>{{ s().fullName }}</h1>
+            <p class="hdr__role">{{ s().title }}</p>
+            <p class="hdr__contact">
+              <span><span class="ic">✉</span>{{ email() }}</span>
+              <span><span class="ic">☎</span>{{ phone() }}</span>
+              <span><span class="ic">⚲</span>{{ location() }}</span>
             </p>
-            <div class="tp__rule"></div>
           </header>
+          <main class="hdr__body">
+            <section class="block"><h2>{{ summaryLabel() }}</h2><p class="lede">{{ s().summary }}</p></section>
+            <section class="block">
+              <h2>Experience</h2>
+              <div class="exp" *ngFor="let e of s().experience">
+                <div class="exp__head"><strong>{{ e.role }}</strong><span class="exp__co">· {{ e.company }}</span><span class="muted exp__date">{{ e.dates }}</span></div>
+                <ul><li *ngFor="let b of e.bullets">{{ b }}</li></ul>
+              </div>
+            </section>
+            <section class="block">
+              <h2>Education</h2>
+              <div class="exp__head"><strong>{{ s().education.degree }}</strong><span class="exp__co">· {{ s().education.school }}</span><span class="muted exp__date">{{ s().education.dates }}</span></div>
+            </section>
+            <section class="block">
+              <h2>Skills</h2>
+              <div class="pills"><span class="pill" *ngFor="let sk of skillTags()">{{ sk }}</span></div>
+            </section>
+            <section class="block" *ngIf="s().certifications?.length">
+              <h2>Certifications</h2>
+              <ul class="certs"><li *ngFor="let c of s().certifications">{{ c }}</li></ul>
+            </section>
+          </main>
+        </div>
+      </ng-container>
 
-          <section>
-            <h2>{{ summaryLabel() }}</h2>
-            <p>{{ sample().summary }}</p>
-          </section>
-
-          <section *ngIf="!isSidebar()">
-            <h2>Skills</h2>
-            <p>{{ sample().skills }}</p>
-          </section>
-
-          <section>
+      <!-- =========================================================== -->
+      <!-- TIMELINE + SKILL PILLS                                       -->
+      <!-- =========================================================== -->
+      <ng-container *ngIf="archetype() === 'timeline'">
+        <div class="tline">
+          <header class="tline__head">
+            <h1>{{ s().fullName }}</h1>
+            <p class="tline__role">{{ s().title }}</p>
+            <p class="tline__contact">
+              <span class="ic">✉</span>{{ email() }} &nbsp;·&nbsp;
+              <span class="ic">☎</span>{{ phone() }} &nbsp;·&nbsp;
+              <span class="ic">⚲</span>{{ location() }}
+            </p>
+            <div class="rule"></div>
+          </header>
+          <section class="block"><h2>{{ summaryLabel() }}</h2><p class="lede">{{ s().summary }}</p></section>
+          <section class="block">
             <h2>Experience</h2>
-            <div class="tp__entry" *ngFor="let e of sample().experience">
-              <div class="tp__entry-head">
-                <strong>{{ e.role }}</strong>
-                <span class="tp__company">· {{ e.company }}</span>
-                <span class="tp__date">{{ e.dates }}</span>
+            <div class="tl tl--marked">
+              <div class="tl__item" *ngFor="let e of s().experience">
+                <div class="tl__head"><strong>{{ e.role }}</strong><span class="tl__co">· {{ e.company }}</span><span class="muted tl__date">{{ e.dates }}</span></div>
+                <ul><li *ngFor="let b of e.bullets">{{ b }}</li></ul>
               </div>
-              <ul>
-                <li *ngFor="let b of e.bullets">{{ b }}</li>
-              </ul>
             </div>
           </section>
-
-          <section>
+          <section class="block">
             <h2>Education</h2>
-            <div class="tp__entry">
-              <div class="tp__entry-head">
-                <strong>{{ sample().education.degree }}</strong>
-                <span class="tp__company">· {{ sample().education.school }}</span>
-                <span class="tp__date">{{ sample().education.dates }}</span>
+            <div class="tl tl--marked">
+              <div class="tl__item">
+                <div class="tl__head"><strong>{{ s().education.degree }}</strong><span class="tl__co">· {{ s().education.school }}</span><span class="muted tl__date">{{ s().education.dates }}</span></div>
               </div>
             </div>
           </section>
-        </main>
-      </div>
+          <section class="block">
+            <h2>Skills</h2>
+            <div class="pills"><span class="pill" *ngFor="let sk of skillTags()">{{ sk }}</span></div>
+          </section>
+          <section class="block" *ngIf="s().certifications?.length">
+            <h2>Certifications</h2>
+            <ul class="certs"><li *ngFor="let c of s().certifications">{{ c }}</li></ul>
+          </section>
+        </div>
+      </ng-container>
+
+      <!-- =========================================================== -->
+      <!-- ELEGANT EDITORIAL                                            -->
+      <!-- =========================================================== -->
+      <ng-container *ngIf="archetype() === 'elegant'">
+        <div class="eleg">
+          <header class="eleg__head">
+            <h1>{{ s().fullName }}</h1>
+            <p class="eleg__role">{{ s().title }}</p>
+            <p class="eleg__contact">{{ email() }} &nbsp;·&nbsp; {{ phone() }} &nbsp;·&nbsp; {{ location() }}</p>
+            <div class="eleg__rule"></div>
+          </header>
+          <section class="block"><h2>{{ summaryLabel() }}</h2><p class="lede">{{ s().summary }}</p></section>
+          <section class="block">
+            <h2>Experience</h2>
+            <div class="eleg__exp" *ngFor="let e of s().experience">
+              <div class="eleg__exp-head"><strong>{{ e.role }}</strong><span class="muted">{{ e.dates }}</span></div>
+              <div class="eleg__co">{{ e.company }}</div>
+              <ul><li *ngFor="let b of e.bullets">{{ b }}</li></ul>
+            </div>
+          </section>
+          <section class="block">
+            <h2>Education</h2>
+            <div class="eleg__exp-head"><strong>{{ s().education.degree }}</strong><span class="muted">{{ s().education.dates }}</span></div>
+            <div class="eleg__co">{{ s().education.school }}</div>
+          </section>
+          <section class="block"><h2>Skills</h2><p class="eleg__skills">{{ s().skills }}</p></section>
+          <section class="block" *ngIf="s().certifications?.length">
+            <h2>Certifications</h2>
+            <p class="eleg__skills" *ngFor="let c of s().certifications">{{ c }}</p>
+          </section>
+        </div>
+      </ng-container>
     </div>
   `,
   styles: [`
     :host { display: block; width: 100%; height: 100%; }
 
-    /* ---------- Skeleton ---------- */
     .tp {
-      background: var(--tp-surface, #fff);
-      color: var(--tp-ink, #111);
-      font-family: var(--tp-font-b, Inter), sans-serif;
+      width: 100%; height: 100%;
+      background: var(--tp-surface);
+      color: var(--tp-ink);
+      font-family: 'Inter', system-ui, sans-serif;
       overflow: hidden;
-      width: 100%;
-      height: 100%;
+      font-size: 11px;
+      line-height: 1.5;
     }
-    .tp__page { padding: 24px 28px; height: 100%; box-sizing: border-box; }
-    .tp__page--sidebar-left  { display: grid; grid-template-columns: 32% 68%; padding: 0; height: 100%; }
-    .tp__page--sidebar-right { display: grid; grid-template-columns: 68% 32%; padding: 0; height: 100%; }
-    .tp__page--sidebar-right .tp__side { order: 2; }
-    .tp__page--two-column main { columns: 2; column-gap: 18px; }
-    .tp__page--compact .tp__entry ul li { font-size: 9.5px; line-height: 1.35; }
-
-    /* Sidebar block */
-    .tp__side {
-      background: var(--tp-primary);
-      color: #f4f4f5;
-      padding: 22px 18px;
+    .tp--serif h1, .tp--serif h2, .tp--serif h4 {
+      font-family: 'Source Serif Pro', Georgia, 'Times New Roman', serif;
     }
-    .tp__side h3 { font-size: 9.5px; text-transform: uppercase; letter-spacing: .12em; margin: 14px 0 6px; color: #fff; opacity: .9; }
-    .tp__side .tp__small { font-size: 9px; opacity: .85; margin: 0 0 2px; }
-    .tp__avatar {
-      width: 46px; height: 46px; border-radius: 50%;
-      background: var(--tp-accent); color: #fff; display: flex;
-      align-items: center; justify-content: center; font-weight: 700; font-size: 14px;
-      margin-bottom: 10px;
+
+    /* shared atoms */
+    h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -.01em; line-height: 1.05; color: var(--tp-ink); }
+    h2 { margin: 0 0 7px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--tp-primary); }
+    .muted { color: color-mix(in srgb, var(--tp-ink) 55%, transparent); font-weight: 500; }
+    .lede { margin: 0; }
+    .block { margin-bottom: 15px; }
+    ul { margin: 5px 0 0; padding-left: 15px; }
+    li { margin-bottom: 3px; }
+    .ic {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 13px; height: 13px; margin-right: 6px; font-size: 8px; font-style: normal;
+      border-radius: 4px; background: color-mix(in srgb, var(--tp-accent) 18%, transparent);
+      color: var(--tp-accent); flex: 0 0 13px; font-weight: 700;
     }
-    .tp__chips { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 4px; }
-    .tp__chips li { font-size: 8.5px; padding: 2px 6px; border-radius: 999px; background: rgba(255,255,255,.12); }
-    .tp__main { padding: 24px 26px; min-width: 0; }
-    .tp__page--sidebar-left .tp__main,
-    .tp__page--sidebar-right .tp__main { padding: 24px 26px; }
 
-    /* ---------- Typography ---------- */
-    .tp h1 { font-family: var(--tp-font-h, Inter); font-size: 22px; margin: 0; line-height: 1.1; color: var(--tp-primary); letter-spacing: -.01em; }
-    .tp h2 { font-family: var(--tp-font-h, Inter); font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; margin: 12px 0 5px; color: var(--tp-primary); }
-    .tp p, .tp li { font-size: 10px; line-height: 1.45; margin: 0 0 3px; }
-    .tp__title { color: var(--tp-accent); font-weight: 600; margin: 2px 0 4px; }
-    .tp__contact { font-size: 9px; color: #555; }
-    .tp__rule { height: 1px; background: var(--tp-primary); opacity: .15; margin: 8px 0 4px; }
-    .tp__entry { margin: 4px 0 8px; }
-    .tp__entry-head strong { font-size: 10.5px; }
-    .tp__entry-head .tp__company { font-size: 10px; color: #444; margin-left: 2px; }
-    .tp__entry-head .tp__date { float: right; font-size: 9.5px; color: #666; }
-    .tp ul { margin: 3px 0 0 14px; padding: 0; }
+    /* certifications */
+    .certs { margin: 4px 0 0; padding-left: 15px; }
+    .certs li { margin-bottom: 3px; }
+    .side__cert { font-size: 9px; color: rgba(255,255,255,.9); margin: 0 0 5px; line-height: 1.4; }
 
-    /* ---------- Thumbnail mode ---------- */
+    /* pills */
+    .pills { display: flex; flex-wrap: wrap; gap: 5px; }
+    .pill {
+      font-size: 9.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px;
+      background: color-mix(in srgb, var(--tp-accent) 12%, transparent);
+      color: color-mix(in srgb, var(--tp-accent) 75%, var(--tp-ink));
+      border: 1px solid color-mix(in srgb, var(--tp-accent) 25%, transparent);
+    }
+
+    /* timeline list */
+    .tl__item { margin-bottom: 9px; }
+    .tl__head { display: flex; align-items: baseline; gap: 5px; }
+    .tl__head strong { font-size: 11.5px; }
+    .tl__co { color: color-mix(in srgb, var(--tp-ink) 65%, transparent); }
+    .tl__date { margin-left: auto; font-size: 9.5px; white-space: nowrap; }
+    .tl__sub { color: var(--tp-accent); font-weight: 600; margin-top: 1px; }
+    .tl--marked { position: relative; padding-left: 16px; }
+    .tl--marked::before {
+      content: ''; position: absolute; left: 4px; top: 4px; bottom: 4px;
+      width: 2px; background: color-mix(in srgb, var(--tp-accent) 30%, transparent);
+    }
+    .tl--marked .tl__item { position: relative; }
+    .tl--marked .tl__item::before {
+      content: ''; position: absolute; left: -16px; top: 4px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--tp-accent); box-shadow: 0 0 0 2px var(--tp-surface);
+    }
+
+    /* ============================ SIDEBAR PRO ============================ */
+    .grid-side { display: grid; grid-template-columns: 34% 66%; height: 100%; }
+    .tp--side-right .grid-side { grid-template-columns: 66% 34%; }
+    .tp--side-right .side { order: 2; }
+    .side {
+      background: linear-gradient(165deg,
+        var(--tp-primary) 0%,
+        color-mix(in srgb, var(--tp-primary) 80%, var(--tp-accent)) 100%);
+      color: #fff; padding: 22px 18px;
+    }
+    .side__avatar {
+      width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800; color: var(--tp-primary);
+      background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.25);
+    }
+    .side__name { text-align: center; font-weight: 800; font-size: 14px; margin: 0; color: #fff; }
+    .side__role { text-align: center; font-size: 10px; margin: 1px 0 16px; color: rgba(255,255,255,.8); }
+    .side__block { margin-bottom: 16px; }
+    .side__block h4 {
+      font-size: 10px; text-transform: uppercase; letter-spacing: .14em;
+      margin: 0 0 8px; padding-bottom: 4px; color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,.25);
+    }
+    .side__row { display: flex; align-items: center; font-size: 9px; margin: 0 0 4px; color: rgba(255,255,255,.92); word-break: break-all; }
+    .side__row .ic { background: rgba(255,255,255,.18); color: #fff; }
+    .skillbar { margin-bottom: 7px; }
+    .skillbar__name { font-size: 9.5px; display: block; margin-bottom: 3px; color: #fff; }
+    .skillbar__track { display: block; height: 4px; border-radius: 999px; background: rgba(255,255,255,.2); }
+    .skillbar__fill { display: block; height: 100%; border-radius: 999px; background: #fff; }
+    .lang { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .lang__name { font-size: 9.5px; color: #fff; }
+    .lang__dots { display: flex; gap: 3px; }
+    .lang__dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.28); }
+    .lang__dots i.on { background: #fff; }
+    .main { padding: 22px 22px; min-width: 0; }
+    .main h1 { display: none; }   /* name lives in the sidebar for this archetype */
+
+    /* ============================ HEADER BAND ============================ */
+    .hdr__band {
+      background: linear-gradient(120deg, var(--tp-primary), color-mix(in srgb, var(--tp-primary) 70%, var(--tp-accent)));
+      color: #fff; padding: 26px 28px 22px;
+    }
+    .hdr__band h1 { color: #fff; }
+    .hdr__role { margin: 3px 0 12px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.9); }
+    .hdr__contact { display: flex; flex-wrap: wrap; gap: 14px; font-size: 9.5px; color: rgba(255,255,255,.92); margin: 0; }
+    .hdr__contact .ic { background: rgba(255,255,255,.2); color: #fff; }
+    .hdr__contact span { display: inline-flex; align-items: center; }
+    .hdr__body { padding: 20px 28px; }
+    .hdr__body h2 { position: relative; padding-left: 12px; }
+    .hdr__body h2::before { content: ''; position: absolute; left: 0; top: 1px; bottom: 1px; width: 4px; border-radius: 2px; background: var(--tp-accent); }
+    .exp { margin-bottom: 10px; }
+    .exp__head { display: flex; align-items: baseline; gap: 5px; }
+    .exp__head strong { font-size: 11.5px; }
+    .exp__co { color: color-mix(in srgb, var(--tp-ink) 60%, transparent); }
+    .exp__date { margin-left: auto; font-size: 9.5px; white-space: nowrap; }
+
+    /* ============================ TIMELINE ============================ */
+    .tline { padding: 24px 26px; }
+    .tline__head h1 { color: var(--tp-primary); }
+    .tline__role { margin: 3px 0 8px; font-size: 13px; font-weight: 600; color: var(--tp-accent); }
+    .tline__contact { font-size: 9.5px; margin: 0; color: color-mix(in srgb, var(--tp-ink) 70%, transparent); display: flex; align-items: center; flex-wrap: wrap; }
+    .tline__contact .ic { margin-left: 0; }
+    .rule { height: 2px; background: linear-gradient(90deg, var(--tp-accent), transparent); margin: 12px 0 14px; border-radius: 2px; }
+
+    /* ============================ ELEGANT ============================ */
+    .eleg { padding: 30px 34px; }
+    .eleg__head { text-align: center; margin-bottom: 6px; }
+    .eleg__head h1 { font-size: 26px; font-weight: 600; letter-spacing: .04em; }
+    .eleg__role { font-size: 12px; font-style: italic; color: var(--tp-accent); margin: 4px 0; letter-spacing: .03em; }
+    .eleg__contact { font-size: 9.5px; color: color-mix(in srgb, var(--tp-ink) 65%, transparent); margin: 4px 0 0; }
+    .eleg__rule { width: 56px; height: 2px; background: var(--tp-accent); margin: 12px auto 16px; }
+    .eleg .block h2 { text-align: center; letter-spacing: .26em; font-weight: 600; margin-bottom: 10px; }
+    .eleg__exp { margin-bottom: 11px; }
+    .eleg__exp-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .eleg__exp-head strong { font-size: 12px; }
+    .eleg__co { font-style: italic; color: color-mix(in srgb, var(--tp-ink) 60%, transparent); margin-top: 1px; }
+    .eleg__skills { text-align: center; }
+
+    /* ============================ THUMBNAIL SCALE ============================ */
     .tp--thumb { transform-origin: top left; transform: scale(.46); width: 217.39%; height: 217.39%; pointer-events: none; }
-
-    /* ====================================================================
-       THEMES
-       ==================================================================== */
-
-    /* SILICON VALLEY — modern, generous whitespace, indigo accents */
-    .tp--theme-silicon-valley h2 { border-bottom: 1px solid #e5e7eb; padding-bottom: 2px; }
-
-    /* LONDON CORPORATE — classical, deep navy rules */
-    .tp--theme-london-corporate h2 { border-bottom: 2px solid var(--tp-primary); padding-bottom: 2px; letter-spacing: .14em; }
-    .tp--theme-london-corporate h1 { font-variant: small-caps; letter-spacing: .03em; }
-
-    /* BERLIN ATS — quiet, monochrome, ATS-perfect */
-    .tp--theme-berlin-ats h1 { font-weight: 700; }
-    .tp--theme-berlin-ats h2 { color: #111; border-bottom: 1px solid #ddd; padding-bottom: 2px; }
-    .tp--theme-berlin-ats .tp__title { color: #444; }
-
-    /* ZURICH PRECISION — Swiss grid, single red rule */
-    .tp--theme-zurich-precision h1 { font-weight: 800; }
-    .tp--theme-zurich-precision .tp__rule { background: var(--tp-primary); opacity: 1; height: 2px; }
-    .tp--theme-zurich-precision h2 { color: #000; }
-    .tp--theme-zurich-precision .tp__title { color: var(--tp-primary); }
-
-    /* AMSTERDAM CLEAN — slate + coral micro accent */
-    .tp--theme-amsterdam-clean h2 { color: var(--tp-primary); border-left: 2px solid var(--tp-accent); padding-left: 6px; }
-
-    /* SCANDINAVIAN — minimal, no rules */
-    .tp--theme-scandinavian h1 { font-weight: 600; }
-    .tp--theme-scandinavian h2 { color: #777; }
-    .tp--theme-scandinavian .tp__title { color: #444; }
-
-    /* PARIS CREATIVE — editorial serif, cream */
-    .tp--theme-paris-creative { background: #faf6f0; }
-    .tp--theme-paris-creative h1 { font-family: 'Playfair Display', Georgia, serif; font-weight: 400; font-style: italic; font-size: 26px; }
-    .tp--theme-paris-creative h2 { font-family: 'Playfair Display', Georgia, serif; text-transform: none; letter-spacing: 0; font-style: italic; font-size: 13px; color: var(--tp-accent); }
-
-    /* MILAN EDITORIAL — rose, magazine */
-    .tp--theme-milan-editorial h1 { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; }
-    .tp--theme-milan-editorial h2 { color: var(--tp-accent); border-bottom: 1px dotted var(--tp-accent); padding-bottom: 2px; }
-
-    /* MADRID WARM — coral header bar */
-    .tp--theme-madrid-warm .tp__head { background: var(--tp-accent); color: #fff; margin: -24px -28px 12px; padding: 18px 28px; }
-    .tp--theme-madrid-warm .tp__head h1, .tp--theme-madrid-warm .tp__head .tp__title { color: #fff; }
-    .tp--theme-madrid-warm .tp__head .tp__contact { color: rgba(255,255,255,.85); }
-    .tp--theme-madrid-warm .tp__rule { display: none; }
-
-    /* SYDNEY MODERN — azure accent */
-    .tp--theme-sydney-modern h2 { color: var(--tp-accent); }
-
-    /* DUBAI LUXURY — dark canvas, gold ink */
-    .tp--theme-dubai-luxury { background: #0a0a0a; color: #e8e1c4; }
-    .tp--theme-dubai-luxury h1 { color: #e8d690; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 26px; letter-spacing: .02em; }
-    .tp--theme-dubai-luxury h2 { color: #d4af37; border-bottom: 1px solid rgba(212,175,55,.4); padding-bottom: 3px; letter-spacing: .18em; }
-    .tp--theme-dubai-luxury .tp__title { color: #d4af37; font-style: italic; }
-    .tp--theme-dubai-luxury .tp__contact { color: #b3a06a; }
-    .tp--theme-dubai-luxury .tp__entry-head .tp__company,
-    .tp--theme-dubai-luxury .tp__entry-head .tp__date { color: #b3a06a; }
-    .tp--theme-dubai-luxury .tp__rule { background: #d4af37; opacity: .5; }
-
-    /* RIYADH EXECUTIVE — champagne, elegant */
-    .tp--theme-riyadh-executive { background: #fdfaf3; }
-    .tp--theme-riyadh-executive h1 { font-family: 'Cormorant Garamond', Georgia, serif; color: #3b2f1c; }
-    .tp--theme-riyadh-executive h2 { color: #b08d57; letter-spacing: .14em; }
-    .tp--theme-riyadh-executive .tp__title { color: #b08d57; font-style: italic; }
-
-    /* DOHA PREMIUM — same family, slightly different rhythm */
-    .tp--theme-doha-premium { background: #0a0a0a; color: #f5e6b8; }
-    .tp--theme-doha-premium h1 { color: #f5e6b8; font-family: 'Cormorant Garamond', Georgia, serif; }
-    .tp--theme-doha-premium h2 { color: #d4af37; }
-    .tp--theme-doha-premium .tp__title { color: #d4af37; }
-
-    /* KARACHI VIBRANT — emerald sidebar nod */
-    .tp--theme-karachi-vibrant .tp__side { background: linear-gradient(180deg, #064e3b 0%, #047857 100%); }
-    .tp--theme-karachi-vibrant h2 { color: var(--tp-primary); }
-
-    /* MUMBAI VIBRANT — saffron header */
-    .tp--theme-mumbai-vibrant .tp__head { background: linear-gradient(135deg, #f59e0b 0%, #c2410c 100%); color: #fff; margin: -24px -28px 12px; padding: 18px 28px; }
-    .tp--theme-mumbai-vibrant .tp__head h1,
-    .tp--theme-mumbai-vibrant .tp__head .tp__title { color: #fff; }
-    .tp--theme-mumbai-vibrant .tp__head .tp__contact { color: rgba(255,255,255,.9); }
-    .tp--theme-mumbai-vibrant .tp__rule { display: none; }
-    .tp--theme-mumbai-vibrant h2 { color: var(--tp-accent); }
-
-    /* DHAKA VIBRANT — same family */
-    .tp--theme-dhaka-vibrant .tp__side { background: linear-gradient(180deg, #065f46 0%, #059669 100%); }
-
-    /* SINGAPORE SHARP — sharp blue */
-    .tp--theme-singapore-sharp h2 { color: var(--tp-primary); border-bottom: 1px solid var(--tp-primary); padding-bottom: 2px; }
-
-    /* TOKYO COMPACT — tight rhythm, sakura markers */
-    .tp--theme-tokyo-compact h2 { color: #1a1a1a; }
-    .tp--theme-tokyo-compact h2::before { content: '■'; color: var(--tp-accent); margin-right: 5px; font-size: 8px; }
-    .tp--theme-tokyo-compact .tp__entry { margin: 3px 0 6px; }
-    .tp--theme-tokyo-compact p, .tp--theme-tokyo-compact li { line-height: 1.3; }
-
-    /* SEOUL MODERN — electric blue */
-    .tp--theme-seoul-modern h2 { color: var(--tp-accent); border-bottom: 2px solid var(--tp-accent); padding-bottom: 2px; }
-
-    /* SHANGHAI BOLD — bold coral header */
-    .tp--theme-shanghai-bold .tp__head { background: var(--tp-primary); color: #fff; margin: -24px -28px 12px; padding: 18px 28px; }
-    .tp--theme-shanghai-bold .tp__head h1, .tp--theme-shanghai-bold .tp__head .tp__title { color: #fff; }
-
-    /* SÃO PAULO WARM */
-    .tp--theme-sao-paulo-warm h2 { color: var(--tp-primary); }
-    .tp--theme-sao-paulo-warm .tp__title { color: var(--tp-accent); }
-
-    /* MEXICO WARM */
-    .tp--theme-mexico-warm h2 { color: var(--tp-primary); border-left: 3px solid var(--tp-accent); padding-left: 6px; }
-
-    /* CAPETOWN CLASSIC */
-    .tp--theme-capetown-classic h2 { color: var(--tp-primary); }
-    .tp--theme-capetown-classic h1 { font-family: 'Garamond', Georgia, serif; }
-
-    /* ISTANBUL CLASSIC */
-    .tp--theme-istanbul-classic h2 { color: var(--tp-accent); border-bottom: 1px solid var(--tp-accent); padding-bottom: 2px; }
-
-    /* CAIRO CLASSIC */
-    .tp--theme-cairo-classic h2 { color: var(--tp-primary); }
-
-    /* TORONTO PROFESSIONAL */
-    .tp--theme-toronto-professional h2 { color: var(--tp-primary); border-bottom: 1px solid #e5e7eb; padding-bottom: 2px; }
   `]
 })
 export class TemplatePreviewComponent {
-  // Signal inputs — required so the computeds below react to input changes
-  // (plain @Input properties are NOT tracked by computed(), which is why
-  // live-typed data wasn't refreshing the preview).
   def   = input.required<TemplateSummary>();
   thumb = input(true);
-  /** Optional real user data. When provided, displaces the sample candidate. */
   data  = input<SampleResume | null>(null);
 
-  // Computed properties driven by def() + data()
-  theme = computed(() => COUNTRY_BY_CODE[this.def().countryCode ?? '']?.theme ?? 'silicon-valley');
-  sample = computed<SampleResume>(() => this.data() ?? sampleFor(this.def().category));
-  isSidebar = computed(() => this.def().layoutType === 'sidebar-left' || this.def().layoutType === 'sidebar-right');
-  initials = computed(() =>
-    this.sample().fullName.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase());
-  // Use `||` (not `??`) so empty strings from the builder fall back too,
-  // preventing stray " · · " separators in the contact line.
-  email = computed(() => this.sample().email || (this.sample().fullName.split(' ')[0].toLowerCase() + '@example.com'));
-  phone = computed(() => this.sample().phone || '+1 555 010 2024');
-  location = computed(() => this.sample().location || locationForCountry(this.def().countryCode));
+  readonly dots = [0, 1, 2, 3, 4];
+
+  // ----- Core content -----
+  s = computed<SampleResume>(() => this.data() ?? sampleFor(this.def().category));
+
+  // ----- Layout archetype derived from the template's layoutType -----
+  archetype = computed<'sidebar' | 'header' | 'timeline' | 'elegant'>(() => {
+    switch (this.def().layoutType) {
+      case 'sidebar-left':
+      case 'sidebar-right':
+      case 'two-column':   return 'sidebar';
+      case 'header-block': return 'header';
+      case 'editorial':    return 'elegant';
+      default:             return 'timeline';   // single-column, compact, …
+    }
+  });
+  sideRight = computed(() => this.def().layoutType === 'sidebar-right');
+
+  // Serif heading detection from the template's heading font.
+  serifHead = computed(() => {
+    const h = (this.def().typography?.heading ?? '').toLowerCase();
+    return /playfair|garamond|cormorant|serif|georgia|times/.test(h);
+  });
+
+  // ----- Contact (real data wins; `||` so empty strings fall back) -----
+  initials = computed(() => this.s().fullName.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase());
+  email    = computed(() => this.s().email || (this.s().fullName.split(' ')[0].toLowerCase() + '@email.com'));
+  phone    = computed(() => this.s().phone || '+1 555 010 2024');
+  location = computed(() => this.s().location || locationForCountry(this.def().countryCode));
+  linkedin = computed(() => this.s().linkedin || ('linkedin.com/in/' + this.s().fullName.toLowerCase().replace(/[^a-z]+/g, '')));
+
+  // ----- Skills / languages -----
+  skillBars = computed(() => skillBarsFrom(this.s().skills, 5));
+  skillTags = computed(() => splitSkills(this.s().skills, 9));
+  languages = computed(() =>
+    (this.def().supportedLanguages?.length ? this.def().supportedLanguages : ['English'])
+      .slice(0, 4)
+      .map((name, i) => ({ name, level: i === 0 ? 5 : 4 })));
+
+  // ----- Section label adapts to category -----
   summaryLabel = computed(() => {
     const c = this.def().category;
-    if (c === 'executive')      return 'Executive Summary';
-    if (c === 'fresh-graduate' || c === 'internship') return 'Objective';
-    if (c === 'graphic-designer' || c === 'product-designer' || c === 'ui-ux-designer' || c === 'creative') return 'About';
-    if (c === 'academic' || c === 'research' || c === 'professor') return 'Research Interests';
+    if (c === 'executive')                                                  return 'Executive Summary';
+    if (c === 'fresh-graduate' || c === 'internship')                        return 'Objective';
+    if (['graphic-designer','product-designer','ui-ux-designer','creative'].includes(c)) return 'About';
+    if (['academic','research','professor'].includes(c))                     return 'Research Interests';
     return 'Summary';
   });
-  skillList = computed(() => this.sample().skills.split(/[·,•|]/).map(s => s.trim()).filter(Boolean).slice(0, 6));
 }
