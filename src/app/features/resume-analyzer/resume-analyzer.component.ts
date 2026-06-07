@@ -1,17 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ApiService } from '@core/services/api.service';
 import { SeoService } from '@core/services/seo.service';
-import { AnalyzeResumeResponse } from '@core/models/api.models';
+import { AnalyzeResumeResponse, TemplateSummary } from '@core/models/api.models';
 import { FileUploadComponent } from '@shared/components/file-upload/file-upload.component';
 import { ScoreRingComponent } from '@shared/components/score-ring/score-ring.component';
+import { TemplatePreviewComponent } from '@shared/components/template-preview/template-preview.component';
 import { AdSlotComponent } from '@shared/components/ad-slot/ad-slot.component';
 
 @Component({
   selector: 'app-resume-analyzer',
   standalone: true,
-  imports: [CommonModule, FormsModule, FileUploadComponent, ScoreRingComponent, AdSlotComponent],
+  imports: [CommonModule, FormsModule, RouterLink, FileUploadComponent, ScoreRingComponent, TemplatePreviewComponent, AdSlotComponent],
   templateUrl: './resume-analyzer.component.html',
   styleUrl: './resume-analyzer.component.scss'
 })
@@ -24,6 +26,7 @@ export class ResumeAnalyzerComponent implements OnInit {
   loading = signal(false);
   error   = signal<string | null>(null);
   result  = signal<AnalyzeResumeResponse | null>(null);
+  recommended = signal<TemplateSummary | null>(null);
 
   hasResult = computed(() => !!this.result());
 
@@ -61,7 +64,12 @@ export class ResumeAnalyzerComponent implements OnInit {
     this.error.set(null);
 
     this.api.analyzeResume(f, this.targetRole() || undefined).subscribe({
-      next: (res) => { this.result.set(res); this.loading.set(false); window.scrollTo({ top: 0, behavior: 'smooth' }); },
+      next: (res) => {
+        this.result.set(res);
+        this.loading.set(false);
+        this.loadRecommendation();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
       error: (e) => {
         this.error.set(e?.error?.error ?? 'Something went wrong. Please try again.');
         this.loading.set(false);
@@ -69,9 +77,35 @@ export class ResumeAnalyzerComponent implements OnInit {
     });
   }
 
+  /** A few analyzer roles don't map 1:1 to template categories. */
+  private roleToCategory(slug: string): string {
+    const map: Record<string, string> = {
+      'angular-developer': 'frontend-developer',
+      'dotnet-developer':  'backend-developer',
+      'ux-designer':       'ui-ux-designer'
+    };
+    return map[slug] ?? slug;
+  }
+
+  /** Pick the most popular template matching the target role; fall back to
+   *  the overall most popular if the role has no dedicated template. */
+  private loadRecommendation(): void {
+    const cat = this.targetRole() ? this.roleToCategory(this.targetRole()) : '';
+    this.api.listTemplates({ category: cat || undefined, sort: 'popular', pageSize: 8 }).subscribe({
+      next: r => {
+        if (r.items.length) { this.recommended.set(r.items[0]); return; }
+        // No match for this category → recommend the overall most popular.
+        this.api.listTemplates({ sort: 'popular', pageSize: 8 })
+          .subscribe(r2 => this.recommended.set(r2.items[0] ?? null));
+      },
+      error: () => {}
+    });
+  }
+
   reset(): void {
     this.file.set(null);
     this.result.set(null);
     this.error.set(null);
+    this.recommended.set(null);
   }
 }

@@ -100,6 +100,25 @@
         </div>
       </div>
 
+      <!-- Recommended template -->
+      <div *ngIf="recommended() as t" class="card reco">
+        <div class="reco__preview">
+          <app-template-preview [def]="t" [thumb]="true"></app-template-preview>
+        </div>
+        <div class="reco__body">
+          <p class="reco__kicker">✨ Recommended for you</p>
+          <h3>Rebuild it with “{{ t.name }}”</h3>
+          <p class="text-muted">
+            A recruiter-tested, ATS-friendly template that fits your target role. Start from a clean layout
+            and apply the fixes above in minutes — colours, fonts and sections are all editable.
+          </p>
+          <div class="reco__cta">
+            <a class="btn btn--primary" [routerLink]="['/resume-builder']" [queryParams]="{ template: t.slug }">Use this template →</a>
+            <a class="btn btn--ghost" routerLink="/templates">Browse all templates</a>
+          </div>
+        </div>
+      </div>
+
       <!-- Keywords -->
       <div class="grid grid-2">
         <div class="card">
