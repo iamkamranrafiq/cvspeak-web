@@ -6,30 +6,30 @@ import { Component, Input, computed, signal } from '@angular/core';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="ring" [style.width.px]="size" [style.height.px]="size">
-      <svg [attr.viewBox]="'0 0 ' + size + ' ' + size">
-        <circle [attr.cx]="cx" [attr.cy]="cy" [attr.r]="r" fill="none" stroke="var(--surface-2)" [attr.stroke-width]="stroke"/>
-        <circle [attr.cx]="cx" [attr.cy]="cy" [attr.r]="r" fill="none" [attr.stroke]="ringColor()" [attr.stroke-width]="stroke"
-                [attr.stroke-dasharray]="circumference()"
-                [attr.stroke-dashoffset]="dashOffset()"
-                stroke-linecap="round"
-                [attr.transform]="'rotate(-90 ' + cx + ' ' + cy + ')'" />
-      </svg>
-      <div class="ring__center">
-        <div class="ring__value" [style.color]="ringColor()">{{ value }}</div>
-        <div class="ring__label">{{ label }}</div>
+    <div class="ring-wrap">
+      <div class="ring" [style.width.px]="size" [style.height.px]="size">
+        <svg [attr.viewBox]="'0 0 ' + size + ' ' + size">
+          <circle [attr.cx]="cx" [attr.cy]="cy" [attr.r]="r" fill="none" stroke="var(--surface-2)" [attr.stroke-width]="stroke"/>
+          <circle [attr.cx]="cx" [attr.cy]="cy" [attr.r]="r" fill="none" [attr.stroke]="ringColor()" [attr.stroke-width]="stroke"
+                  [attr.stroke-dasharray]="circumference()"
+                  [attr.stroke-dashoffset]="dashOffset()"
+                  stroke-linecap="round"
+                  [attr.transform]="'rotate(-90 ' + cx + ' ' + cy + ')'" />
+        </svg>
+        <div class="ring__center">
+          <div class="ring__value" [style.color]="ringColor()" [style.fontSize.px]="size * 0.3">{{ value }}</div>
+        </div>
       </div>
+      <div class="ring__label" [style.maxWidth.px]="size + 24">{{ label }}</div>
     </div>
   `,
   styles: [`
+    .ring-wrap { display: inline-flex; flex-direction: column; align-items: center; gap: .45rem; }
     .ring { position: relative; }
     .ring svg { width: 100%; height: 100%; }
-    .ring__center {
-      position: absolute; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-    }
-    .ring__value { font-size: 1.85rem; font-weight: 800; line-height: 1; }
-    .ring__label { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-top: .3rem; }
+    .ring__center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .ring__value { font-weight: 800; line-height: 1; }
+    .ring__label { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); text-align: center; line-height: 1.2; }
   `]
 })
 export class ScoreRingComponent {
