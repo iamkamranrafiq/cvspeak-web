@@ -65,6 +65,17 @@ export class ApiService {
     return this.http.get<PagedList<TemplateSummary>>(`/api/v1/templates?${q.toString()}`);
   }
 
+  /** Records a template download (increments download_count server-side).
+   *  No file is stored — this is just an analytics/popularity signal. */
+  trackTemplateDownload(slug: string): Observable<void> {
+    return this.http.post<void>(`/api/v1/templates/${encodeURIComponent(slug)}/download`, {});
+  }
+
+  /** Persists a complete CV submission (testing / data-analysis phase). */
+  submitCv(body: Record<string, unknown>): Observable<{ id: string }> {
+    return this.http.post<{ id: string }>('/api/v1/cv/submit', body);
+  }
+
   // Tools
   listTools(): Observable<ToolDto[]> {
     return this.http.get<ToolDto[]>('/api/v1/tools');

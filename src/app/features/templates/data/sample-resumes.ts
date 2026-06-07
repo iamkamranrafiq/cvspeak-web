@@ -19,6 +19,9 @@ export interface EducationEntry {
   dates: string;
   detail?: string;
 }
+export interface ProjectEntry { name: string; detail: string; }
+export interface CustomSection { title: string; body: string; }
+
 export interface SampleResume {
   fullName: string;
   title: string;
@@ -31,6 +34,19 @@ export interface SampleResume {
   achievements?: string[];
   /** Optional certifications / licenses — rendered as its own section. */
   certifications?: string[];
+  /** Optional projects section. */
+  projects?: ProjectEntry[];
+  /** Optional awards / honors — one per line. */
+  awards?: string[];
+  /** Optional free-form extra sections (title + body). */
+  customSections?: CustomSection[];
+  /** Optional ordered list of main-column section keys. When omitted a
+   *  sensible default order is used. Recognised keys: summary, achievements,
+   *  experience, projects, education, skills, certifications, awards, plus
+   *  'custom:<index>' for entries in customSections. */
+  sectionOrder?: string[];
+  /** Optional profile photo as a data URL (set by the Resume Builder). */
+  photo?: string;
   /** Optional contact overrides. When provided (e.g. by the Resume Builder),
    *  the preview uses these instead of the generated example contact strings. */
   email?:    string;

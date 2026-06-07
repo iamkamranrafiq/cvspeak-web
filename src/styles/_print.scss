@@ -1,0 +1,45 @@
+// =====================================================================
+// Global print rules.
+// MUST be global (not component-scoped) so `body *` can hide elements that
+// live in OTHER components (navbar, footer, the builder form). When these
+// rules live inside a component's styles[], Angular scopes them with an
+// attribute selector and `body *` no longer matches sibling components,
+// which is why the whole page was printing.
+//
+// On print we hide everything, then reveal only #preview (the resume sheet).
+// =====================================================================
+@media print {
+  // Hide the whole app.
+  body * { visibility: hidden !important; }
+
+  // Reveal only the resume preview and its descendants.
+  #preview,
+  #preview * { visibility: visible !important; }
+
+  // Promote the preview to fill the printed page and let it paginate.
+  #preview {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  // Strip the on-screen paper chrome so the resume bleeds to the page edges.
+  #preview .preview-frame {
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    min-height: 0 !important;
+  }
+
+  // Tidy default print margins (browser adds header/footer otherwise; users
+  // can still toggle those in the print dialog).
+  @page { margin: 0.5in; }
+  html, body { background: #fff !important; }
+}
