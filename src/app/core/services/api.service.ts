@@ -12,11 +12,12 @@ export class ApiService {
   private http = inject(HttpClient);
 
   // Resume / ATS
-  analyzeResume(file: File, targetRole?: string): Observable<AnalyzeResumeResponse> {
+  analyzeResume(file: File, targetRole?: string, ai = true): Observable<AnalyzeResumeResponse> {
     const fd = new FormData();
     fd.append('file', file);
     if (targetRole) fd.append('targetRole', targetRole);
-    return this.http.post<AnalyzeResumeResponse>('/api/v1/resumes/analyze', fd);
+    // ai=false skips the slow Gemini step (used by the instant ATS Checker).
+    return this.http.post<AnalyzeResumeResponse>(`/api/v1/resumes/analyze?ai=${ai}`, fd);
   }
 
   scoreText(resumeText: string, targetRole?: string): Observable<AtsScoreResult> {
@@ -74,6 +75,17 @@ export class ApiService {
   /** Persists a complete CV submission (testing / data-analysis phase). */
   submitCv(body: Record<string, unknown>): Observable<{ id: string }> {
     return this.http.post<{ id: string }>('/api/v1/cv/submit', body);
+  }
+
+  /** Adapt + translate a resume to a target country's conventions (AI). */
+  localizeResume(body: { file?: File; text?: string; countryCode: string; countryName: string }):
+    Observable<{ localized: string; changes: string[]; language: string }> {
+    const fd = new FormData();
+    if (body.file) fd.append('file', body.file);
+    if (body.text) fd.append('text', body.text);
+    fd.append('countryCode', body.countryCode);
+    fd.append('countryName', body.countryName);
+    return this.http.post<{ localized: string; changes: string[]; language: string }>('/api/v1/resume/localize', fd);
   }
 
   // Tools

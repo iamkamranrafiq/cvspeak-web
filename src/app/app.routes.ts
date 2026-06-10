@@ -9,12 +9,14 @@ export const routes: Routes = [
   {
     path: 'resume-analyzer',
     loadComponent: () => import('./features/resume-analyzer/resume-analyzer.component').then(m => m.ResumeAnalyzerComponent),
-    title: 'AI Resume Analyzer — Free Instant Feedback | CVSpeak'
+    title: 'Resume Analyzer & ATS Checker — Free AI Feedback | CVSpeak'
   },
+  // ATS Checker merged into the analyzer — keep the URL alive for SEO/links.
+  { path: 'ats-checker', redirectTo: 'resume-analyzer', pathMatch: 'full' },
   {
-    path: 'ats-checker',
-    loadComponent: () => import('./features/ats-checker/ats-checker.component').then(m => m.AtsCheckerComponent),
-    title: 'Free ATS Resume Checker — Beat the Bots | CVSpeak'
+    path: 'resume-localizer',
+    loadComponent: () => import('./features/resume-localizer/resume-localizer.component').then(m => m.ResumeLocalizerComponent),
+    title: 'Resume Localizer — Adapt Your CV for Any Country (AI) | CVSpeak'
   },
   {
     path: 'job-match',

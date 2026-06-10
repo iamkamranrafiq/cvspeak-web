@@ -21,8 +21,8 @@ import { LogoComponent } from '../logo/logo.component';
         <div class="footer__cols">
           <div>
             <h4>Tools</h4>
-            <a routerLink="/resume-analyzer">Resume Analyzer</a>
-            <a routerLink="/ats-checker">ATS Checker</a>
+            <a routerLink="/resume-analyzer">Resume Analyzer &amp; ATS</a>
+            <a routerLink="/resume-localizer">Resume Localizer</a>
             <a routerLink="/job-match">Job Match</a>
             <a routerLink="/cover-letter">Cover Letter</a>
             <a routerLink="/resume-builder">Resume Builder</a>

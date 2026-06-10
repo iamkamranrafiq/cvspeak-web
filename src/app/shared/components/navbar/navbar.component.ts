@@ -17,12 +17,12 @@ import { ThemeService } from '@core/services/theme.service';
         </a>
 
         <nav class="nav__links" aria-label="Primary">
-          <a routerLink="/resume-analyzer" routerLinkActive="is-active">Resume Analyzer</a>
-          <a routerLink="/ats-checker"     routerLinkActive="is-active">ATS Checker</a>
-          <a routerLink="/job-match"       routerLinkActive="is-active">Job Match</a>
-          <a routerLink="/templates"       routerLinkActive="is-active">Templates</a>
-          <a routerLink="/tools"           routerLinkActive="is-active">Tools</a>
-          <a routerLink="/blog"            routerLinkActive="is-active">Blog</a>
+          <a routerLink="/resume-analyzer"  routerLinkActive="is-active">Analyzer &amp; ATS</a>
+          <a routerLink="/resume-localizer" routerLinkActive="is-active">Localizer</a>
+          <a routerLink="/job-match"        routerLinkActive="is-active">Job Match</a>
+          <a routerLink="/templates"        routerLinkActive="is-active">Templates</a>
+          <a routerLink="/tools"            routerLinkActive="is-active">Tools</a>
+          <a routerLink="/blog"             routerLinkActive="is-active">Blog</a>
         </nav>
 
         <div class="nav__actions">

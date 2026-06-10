@@ -46,8 +46,8 @@ export class ResumeAnalyzerComponent implements OnInit {
 
   ngOnInit(): void {
     this.seo.apply({
-      title:       'AI Resume Analyzer — Free Instant Feedback | CVSpeak',
-      description: 'Upload your resume and get an instant AI analysis: ATS score, keyword gaps, grammar, readability, and improvement tips. Free. No signup.',
+      title:       'Resume Analyzer & ATS Checker — Free AI Feedback | CVSpeak',
+      description: 'Upload your resume for an instant ATS score across format, keywords, grammar, readability and structure — plus AI suggestions on exactly what to fix. Free, no signup.',
       canonical:   '/resume-analyzer'
     });
   }
